@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, useSlots, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
+import { useFocusTrap } from '../composables/useFocusTrap'
+
+// Reentrant body-scroll lock shared across all Modal instances: only the last modal to
+// close restores scrolling, so stacked/nested modals don't unlock the page prematurely.
+let openModalCount = 0
 
 const props = withDefaults(
   defineProps<{
     open?: boolean
     title?: string
+    /** Accessible name used when neither `title` nor a `header` slot is provided. */
+    ariaLabel?: string
     closeOnBackdrop?: boolean
     closeOnEsc?: boolean
   }>(),
@@ -14,6 +21,10 @@ const props = withDefaults(
 const emit = defineEmits<{ close: [] }>()
 const slots = useSlots()
 
+const dialogRef = ref<HTMLElement | null>(null)
+const titleId = useId()
+const { activate, deactivate } = useFocusTrap()
+
 function onKeydown(e: KeyboardEvent) {
   if (props.closeOnEsc && e.key === 'Escape' && props.open) emit('close')
 }
@@ -22,18 +33,51 @@ function onBackdrop() {
   if (props.closeOnBackdrop) emit('close')
 }
 
-// Lock body scroll while open.
+// This instance's hold on the shared scroll lock (kept reentrant-safe).
+let hasScrollLock = false
+function lockScroll() {
+  if (hasScrollLock) return
+  hasScrollLock = true
+  openModalCount += 1
+  document.body.style.overflow = 'hidden'
+}
+function unlockScroll() {
+  if (!hasScrollLock) return
+  hasScrollLock = false
+  openModalCount = Math.max(0, openModalCount - 1)
+  if (openModalCount === 0) document.body.style.overflow = ''
+}
+
+// Client-only open/close handling — reused by BOTH the open-transition watcher and the
+// already-open-on-mount case. A lazy `watch` alone misses a Modal rendered `:open="true"`
+// from first paint; running this in `onMounted` keeps `document` access off the SSR path
+// (so `{ immediate: true }`, which would fire during setup on the server, is deliberately
+// avoided).
+async function handleOpen() {
+  lockScroll()
+  await nextTick()
+  if (dialogRef.value) activate(dialogRef.value)
+}
+function handleClose() {
+  unlockScroll()
+  deactivate()
+}
+
 watch(
   () => props.open,
   (isOpen) => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
+    if (isOpen) void handleOpen()
+    else handleClose()
   },
 )
 
-onMounted(() => window.addEventListener('keydown', onKeydown))
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  if (props.open) void handleOpen()
+})
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
-  document.body.style.overflow = ''
+  handleClose()
 })
 </script>
 
@@ -41,8 +85,16 @@ onBeforeUnmount(() => {
   <Teleport to="body">
     <Transition name="nv-modal">
       <div v-if="open" class="nv-modal-overlay" @click.self="onBackdrop">
-        <div class="nv-modal" role="dialog" aria-modal="true">
-          <header v-if="title || slots.header" class="nv-modal__header">
+        <div
+          ref="dialogRef"
+          class="nv-modal"
+          role="dialog"
+          aria-modal="true"
+          tabindex="-1"
+          :aria-labelledby="title || slots.header ? titleId : undefined"
+          :aria-label="!(title || slots.header) ? ariaLabel : undefined"
+        >
+          <header v-if="title || slots.header" :id="titleId" class="nv-modal__header">
             <slot name="header">{{ title }}</slot>
           </header>
           <div class="nv-modal__body">
@@ -67,7 +119,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  z-index: 2000;
+  z-index: var(--z-modal);
 }
 
 .nv-modal {

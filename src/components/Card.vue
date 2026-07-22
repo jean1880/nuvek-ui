@@ -20,10 +20,7 @@ withDefaults(
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
   padding: var(--space-6);
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.2),
-    0 2px 4px -1px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05); /* subtle rim light */
+  box-shadow: var(--card-shadow);
   transition: var(--transition);
 }
 

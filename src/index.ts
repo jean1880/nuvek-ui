@@ -3,7 +3,7 @@
 // `import { Button, Badge, ... } from '@nuvek/ui'` for components.
 import './style.css'
 
-export const version = '0.1.0'
+export const version = '0.1.1'
 
 // Components
 export { default as Button } from './components/Button.vue'
@@ -18,3 +18,4 @@ export { useToasts } from './composables/useToasts'
 export type { Toast, ToastType } from './composables/useToasts'
 export { useTheme } from './composables/useTheme'
 export type { Theme } from './composables/useTheme'
+export { useFocusTrap } from './composables/useFocusTrap'

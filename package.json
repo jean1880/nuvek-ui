@@ -1,6 +1,6 @@
 {
   "name": "@nuvek/ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared nuvek design system — CSS tokens, base styles, and Vue 3 components.",
   "type": "module",
   "files": [
@@ -16,8 +16,8 @@
       "require": "./dist/nuvek-ui.umd.cjs"
     },
     "./style.css": "./dist/nuvek-ui.css",
-    "./tokens.css": "./src/tokens.css",
-    "./base.css": "./src/base.css"
+    "./tokens.css": "./dist/tokens.css",
+    "./base.css": "./dist/base.css"
   },
   "sideEffects": [
     "**/*.css"

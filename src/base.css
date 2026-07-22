@@ -65,7 +65,7 @@ body {
 .animate-pulse { animation: pulse-subtle 2s infinite ease-in-out; }
 
 /* Interactive Elements */
-.clickable {
+.nv-clickable {
     cursor: pointer;
     user-select: none;
 }

@@ -32,7 +32,7 @@ defineProps<{ toasts: Toast[] }>()
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  z-index: 2000;
+  z-index: var(--z-toast);
 }
 
 .nv-toast {
@@ -50,8 +50,8 @@ defineProps<{ toasts: Toast[] }>()
 }
 
 .nv-toast__icon {
-  width: 24px;
-  height: 24px;
+  width: var(--space-6);
+  height: var(--space-6);
   border-radius: 50%;
   display: flex;
   align-items: center;

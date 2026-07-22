@@ -82,8 +82,20 @@
     /* Component Tokens */
     --btn-radius: var(--radius-md);
     --card-radius: var(--radius-lg);
+    --card-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.2),
+        0 2px 4px -1px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05); /* rim light */
 
-    /* Jenkins-esque Semantic Colors */
+    /* Z-index scale — coherent stacking across overlays */
+    --z-dropdown: 1000;
+    --z-sticky: 1100;
+    --z-overlay: 1300;
+    --z-modal: 1400;
+    --z-popover: 1500;
+    --z-toast: 1600;
+
+    /* Status colours (CI/build-style) */
     --status-success: #22c55e;
     --status-error: #ef4444;
     --status-warning: #f59e0b;
