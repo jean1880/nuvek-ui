@@ -1,14 +1,22 @@
 import { ref } from 'vue'
 
-export type Theme = 'dark' | 'light'
+/**
+ * A theme name. Only `dark` ships today; add a theme purely by defining a
+ * `:root[data-theme="<name>"]` token-override block in `tokens.css` — no change here.
+ * The `(string & {})` keeps `dark` autocompleting while allowing any custom name.
+ */
+export type Theme = 'dark' | (string & {})
 
 const STORAGE_KEY = 'nuvek-theme'
-// The token set is dark-first (a single :root). `light` is reserved for a future
-// palette; until light tokens land, switching only stamps `data-theme` for
-// forward-compatible styling hooks.
-const theme = ref<Theme>('dark')
+const DEFAULT_THEME = 'dark'
 
-/** Shared theme state — reads/sets the `data-theme` attribute on <html> and persists it. */
+// Shared reactive theme name, stamped onto <html data-theme>.
+const theme = ref<Theme>(DEFAULT_THEME)
+
+/**
+ * Theme support: stamp and persist a `data-theme` name on `<html>`. The token-override
+ * blocks in `tokens.css` do the actual reskinning — this composable only tracks/sets the name.
+ */
 export function useTheme() {
   function setTheme(next: Theme) {
     theme.value = next
@@ -20,11 +28,7 @@ export function useTheme() {
     }
   }
 
-  function toggleTheme() {
-    setTheme(theme.value === 'dark' ? 'light' : 'dark')
-  }
-
-  /** Call once at app startup to restore a persisted choice (defaults to dark). */
+  /** Call once at startup to restore a persisted theme (defaults to `dark`). */
   function initTheme() {
     let stored: string | null = null
     try {
@@ -32,8 +36,8 @@ export function useTheme() {
     } catch {
       /* ignore */
     }
-    setTheme(stored === 'light' ? 'light' : 'dark')
+    setTheme(stored || DEFAULT_THEME)
   }
 
-  return { theme, setTheme, toggleTheme, initTheme }
+  return { theme, setTheme, initTheme }
 }

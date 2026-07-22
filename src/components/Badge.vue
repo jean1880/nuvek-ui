@@ -29,12 +29,12 @@ withDefaults(
 }
 
 .nv-badge--success {
-  background: rgba(var(--success-rgb), 0.12);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
   color: var(--success);
   border-color: var(--success-border);
 }
 .nv-badge--error {
-  background: rgba(var(--error-rgb), 0.12);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
   color: var(--error);
   border-color: var(--error-border);
 }
@@ -44,7 +44,7 @@ withDefaults(
   border-color: var(--primary-border);
 }
 .nv-badge--warning {
-  background: rgba(var(--warning-rgb), 0.12);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
   color: var(--warning);
   border-color: var(--warning-border);
 }

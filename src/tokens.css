@@ -114,4 +114,11 @@
     --text-xl: 1.25rem;     /* 20px */
     --text-2xl: 1.5rem;     /* 24px */
     --text-3xl: 1.875rem;   /* 30px */
+
+    /* Fluid type (opt-in) — scales between viewport bounds; use where text should breathe.
+       The fixed --text-* scale above stays the default; reach for these only when wanted. */
+    --text-fluid-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+    --text-fluid-lg: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+    --text-fluid-xl: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+    --text-fluid-2xl: clamp(1.375rem, 1.2rem + 0.9vw, 1.875rem);
 }

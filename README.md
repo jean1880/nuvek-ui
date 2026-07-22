@@ -43,7 +43,7 @@ reskin automatically when tokens change.
 | `Card` | `hoverable?: boolean` (default `false`) | default | — |
 | `Panel` | `title?: string` | default · `header` | — |
 | `Modal` | `open?: boolean` (default `false`) · `title?: string` · `ariaLabel?: string` (accessible name when no title/header) · `closeOnBackdrop?: boolean` (default `true`) · `closeOnEsc?: boolean` (default `true`) | default (body) · `header` · `footer` | `close` |
-| `ToastStack` | `toasts: Toast[]` (pair with `useToasts`) | — | — |
+| `ToastStack` | `toasts: Toast[]` (pair with `useToasts`) · `dismissible?: boolean` (default `true`) | — | `dismiss` (toast id — wire to `useToasts().dismiss`) |
 
 `Modal` is accessible: `Teleport`ed to `<body>`, `role="dialog"` + `aria-modal`, `aria-labelledby`
 wired to the header, **focus-trapped** (focus moves in on open, cycles on Tab, restores on close),
@@ -53,18 +53,20 @@ Esc-to-close, and body-scroll lock.
 
 - `useToasts(timeoutMs = 4000)` → `{ toasts, showToast(msg, type?), dismiss(id) }`.
   `ToastType = 'success' | 'error' | 'warning' | 'info'`.
-- `useTheme()` → `{ theme, setTheme(t), toggleTheme(), initTheme() }`. `Theme = 'dark' | 'light'`.
-  **Note:** the token set is dark-first; `light` stamps `data-theme="light"` but a light palette
-  is not yet shipped, so switching is a no-op until the light tokens land (tracked for v0.2.0).
+- `useTheme()` → `{ theme, setTheme(name), initTheme() }`. `Theme = 'dark' | (string & {})`.
+  Theming is **supported**: `setTheme` stamps a `data-theme` name on `<html>` and persists it, and a
+  theme is added purely by defining a `:root[data-theme="<name>"]` token-override block in
+  `tokens.css` — no code change. **Only `dark` ships today** (the system is dark-only by design).
 - `useFocusTrap()` → `{ activate(el), deactivate() }`. Standalone focus trap for custom overlays.
 
 ### Design tokens
 
 Every themeable value is a CSS custom property in `tokens.css` — colour scales
 (`--bg/--surface/--text/--border`), semantics (`--primary/--success/--error/--warning/--idle`
-with `-rgb/-border/-soft` variants), scales (`--radius-*`, `--space-*`, `--shadow-*`, `--text-*`),
-a z-index scale (`--z-dropdown … --z-toast`), and component tokens (`--btn-radius`, `--card-radius`,
-`--card-shadow`). Override any of them in your app's `:root` to reskin.
+with `-rgb/-border/-soft` variants), scales (`--radius-*`, `--space-*`, `--shadow-*`, `--text-*`
+plus opt-in fluid `--text-fluid-*` via `clamp()`), a z-index scale (`--z-dropdown … --z-toast`), and
+component tokens (`--btn-radius`, `--card-radius`, `--card-shadow`). Override any of them in your
+app's `:root` to reskin, or add a `:root[data-theme="<name>"]` block for an alternate theme.
 
 ## Develop
 

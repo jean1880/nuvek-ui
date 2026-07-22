@@ -56,7 +56,7 @@ withDefaults(
 }
 
 .nv-btn--danger {
-  background: rgba(var(--error-rgb), 0.1);
+  background: color-mix(in srgb, var(--error) 10%, transparent);
   color: var(--error);
   border-color: var(--error-border);
 }

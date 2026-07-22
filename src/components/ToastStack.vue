@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import type { Toast } from '../composables/useToasts'
 
-defineProps<{ toasts: Toast[] }>()
+withDefaults(
+  defineProps<{
+    toasts: Toast[]
+    /** Show a per-toast dismiss button that emits `dismiss`. Wire it to `useToasts().dismiss`. */
+    dismissible?: boolean
+  }>(),
+  { dismissible: true },
+)
+
+const emit = defineEmits<{ dismiss: [id: number] }>()
 </script>
 
 <template>
@@ -14,11 +23,20 @@ defineProps<{ toasts: Toast[] }>()
         role="status"
       >
         <div class="nv-toast__icon">
-          <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-          <svg v-else-if="toast.type === 'error'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+          <svg v-if="toast.type === 'success'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+          <svg v-else-if="toast.type === 'error'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          <svg v-else aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
         </div>
-        {{ toast.msg }}
+        <span class="nv-toast__msg">{{ toast.msg }}</span>
+        <button
+          v-if="dismissible"
+          type="button"
+          class="nv-toast__close"
+          aria-label="Dismiss notification"
+          @click="emit('dismiss', toast.id)"
+        >
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        </button>
       </div>
     </TransitionGroup>
   </div>
@@ -27,8 +45,8 @@ defineProps<{ toasts: Toast[] }>()
 <style scoped>
 .nv-toast-container {
   position: fixed;
-  bottom: var(--space-8);
-  right: var(--space-8);
+  inset-block-end: var(--space-8);
+  inset-inline-end: var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -57,6 +75,30 @@ defineProps<{ toasts: Toast[] }>()
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.nv-toast__msg {
+  flex: 1 1 auto;
+}
+
+.nv-toast__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.nv-toast__close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .nv-toast--success .nv-toast__icon {
