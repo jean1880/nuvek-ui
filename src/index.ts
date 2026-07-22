@@ -3,7 +3,7 @@
 // `import { Button, Badge, ... } from '@nuvek/ui'` for components.
 import './style.css'
 
-export const version = '0.2.0'
+export const version = '0.2.1'
 
 // Components
 export { default as Button } from './components/Button.vue'
