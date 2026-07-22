@@ -1,0 +1,5 @@
+/* nuvek-ui aggregate stylesheet.
+   CSS-only consumers can `@import '@nuvek/ui/style.css'` to get tokens + base in one line.
+   Component-consuming apps import individual SFCs from the JS entry (which pull their own styles). */
+@import './tokens.css';
+@import './base.css';
