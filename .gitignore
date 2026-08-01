@@ -6,3 +6,22 @@ dist/
 
 # Scratch diffs from refactors — never an artifact worth tracking.
 *.patch
+
+# OS / editor cruft and local env files
+._*
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Node build artifacts and deps
+coverage/
+npm-debug.log*
+yarn-error.log*
+.npm/
