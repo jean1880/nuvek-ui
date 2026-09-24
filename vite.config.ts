@@ -2,36 +2,38 @@ import { copyFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import pkg from './package.json' with { type: 'json' }
 
-// Copy the raw token/base stylesheets into dist so consumers can import them directly
-// (`@nuvek/ui/tokens.css`) — the package only ships `dist/`, so the raw CSS must land there too.
-function copyRawCss(): Plugin {
-  const resolve = (rel: string) => fileURLToPath(new URL(rel, import.meta.url))
+const resolve = (rel: string) => fileURLToPath(new URL(rel, import.meta.url))
+
+// Ship theme.css as-is: it is Tailwind SOURCE (@theme/@source), compiled by the consumer's
+// Tailwind build — never by this one. Its `@source "./"` is relative to dist/, where the
+// component bundle whose class strings the consumer must scan also lives.
+function copyTheme(): Plugin {
   return {
-    name: 'nuvek-copy-raw-css',
+    name: 'nuvek-copy-theme',
     closeBundle() {
-      copyFileSync(resolve('./src/tokens.css'), resolve('./dist/tokens.css'))
-      copyFileSync(resolve('./src/base.css'), resolve('./dist/base.css'))
+      copyFileSync(resolve('./src/theme.css'), resolve('./dist/theme.css'))
     },
   }
 }
 
-// Library build: emit an ESM + UMD bundle plus a single stylesheet (nuvek-ui.css).
-// `vue` is externalized so consumers dedupe on their own copy.
+// Every runtime/peer dependency stays external (including deep imports like
+// `reka-ui/…`), so consumers dedupe on their own copies.
+const external = [
+  ...Object.keys(pkg.peerDependencies ?? {}),
+  ...Object.keys(pkg.dependencies ?? {}),
+].map((name) => new RegExp(`^${name}(/.*)?$`))
+
+// Library build: ESM only (every consumer is a Vite app) and NO stylesheet output.
 export default defineConfig({
-  plugins: [vue(), copyRawCss()],
+  plugins: [vue(), copyTheme()],
   build: {
     lib: {
-      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: 'NuvekUI',
+      entry: resolve('./src/index.ts'),
+      formats: ['es'],
       fileName: 'nuvek-ui',
     },
-    rollupOptions: {
-      external: ['vue'],
-      output: {
-        globals: { vue: 'Vue' },
-        assetFileNames: 'nuvek-ui.[ext]',
-      },
-    },
+    rollupOptions: { external },
   },
 })

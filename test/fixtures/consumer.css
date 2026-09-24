@@ -1,0 +1,4 @@
+/* A consumer stylesheet exactly as the README prescribes, except automatic source
+   detection is OFF — so every generated class must come from theme.css's own @source. */
+@import "tailwindcss" source(none);
+@import "../../dist/theme.css";

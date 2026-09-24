@@ -1,0 +1,5 @@
+/* Consumes the SOURCE theme; @source below covers the SFCs (the dist @source isn't built here). */
+@import "tailwindcss";
+@import "../src/theme.css";
+@source "../src";
+@source "./";

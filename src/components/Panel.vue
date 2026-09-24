@@ -1,43 +1,23 @@
 <script setup lang="ts">
-import { useSlots } from 'vue'
+import type { HTMLAttributes } from 'vue'
+import { cn } from '../lib/cn'
 
-defineProps<{
+const props = defineProps<{
   title?: string
+  class?: HTMLAttributes['class']
 }>()
-
-const slots = useSlots()
 </script>
 
 <template>
-  <section class="nv-panel">
-    <header v-if="title || slots.header" class="nv-panel__header">
+  <section :class="cn('overflow-hidden rounded-lg border border-border bg-surface', props.class)">
+    <header
+      v-if="title || $slots.header"
+      class="border-b border-border px-4 py-3 text-sm font-bold uppercase tracking-wider text-fg-muted"
+    >
       <slot name="header">{{ title }}</slot>
     </header>
-    <div class="nv-panel__body">
+    <div class="p-4">
       <slot />
     </div>
   </section>
 </template>
-
-<style scoped>
-.nv-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.nv-panel__header {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
-.nv-panel__body {
-  padding: var(--space-4);
-}
-</style>

@@ -6,22 +6,23 @@ export interface Toast {
   id: number
   msg: string
   type: ToastType
+  /** How long the toast stays up, in ms. ToastStack's timer owns this (it pauses on hover). */
+  duration: number
 }
 
 /**
- * Shared transient-notification state. Pair with the `ToastStack` component:
- * `const { toasts, showToast } = useToasts()` → `<ToastStack :toasts="toasts" />`.
+ * Shared transient-notification state. Pair with `ToastStack`, wiring BOTH directions —
+ * the stack owns each toast's lifetime and reports when it ends:
+ *
+ *   const { toasts, showToast, dismiss } = useToasts()
+ *   <ToastStack :toasts="toasts" @dismiss="dismiss" />
  */
-export function useToasts(timeoutMs = 4000) {
+export function useToasts(durationMs = 4000) {
   const toasts = ref<Toast[]>([])
   let nextId = 0
 
   function showToast(msg: string, type: ToastType = 'success') {
-    const id = nextId++
-    toasts.value.push({ id, msg, type })
-    setTimeout(() => {
-      toasts.value = toasts.value.filter((t) => t.id !== id)
-    }, timeoutMs)
+    toasts.value.push({ id: nextId++, msg, type, duration: durationMs })
   }
 
   function dismiss(id: number) {

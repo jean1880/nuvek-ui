@@ -1,23 +1,19 @@
 {
   "name": "@nuvek/ui",
-  "version": "0.3.0",
-  "description": "Shared nuvek design system — CSS tokens, base styles, and Vue 3 components.",
+  "version": "1.0.0",
+  "description": "Shared nuvek design system — Tailwind v4 theme tokens and headless (Reka UI) Vue 3 components.",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/nuvek-ui.umd.cjs",
   "module": "./dist/nuvek-ui.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/nuvek-ui.js",
-      "require": "./dist/nuvek-ui.umd.cjs"
+      "import": "./dist/nuvek-ui.js"
     },
-    "./style.css": "./dist/nuvek-ui.css",
-    "./tokens.css": "./dist/tokens.css",
-    "./base.css": "./dist/base.css"
+    "./theme.css": "./dist/theme.css"
   },
   "sideEffects": [
     "**/*.css"
@@ -26,16 +22,31 @@
     "build": "vite build && vue-tsc --declaration --emitDeclarationOnly --outDir dist",
     "dev": "vite build --watch",
     "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "playground": "vite --config playground/vite.config.ts",
     "prepare": "npm run build"
   },
   "peerDependencies": {
+    "reka-ui": "^2.10.5",
     "vue": "^3.5.0"
   },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.7.0"
+  },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.2",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^20.14.5",
+    "reka-ui": "^2.10.5",
+    "tailwindcss": "^4.3.3",
     "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vue": "^3.5.25",
-    "vue-tsc": "^3.1.5"
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1",
+    "vue": "^3.5.43",
+    "vue-tsc": "^3.3.11"
   }
 }

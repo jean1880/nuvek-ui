@@ -1,130 +1,70 @@
 <script setup lang="ts">
-import type { Toast } from '../composables/useToasts'
+// Reka UI's Toast owns the behaviour: an aria-live region (errors announce assertively),
+// a per-toast timer that pauses on hover/focus and window blur, swipe-to-dismiss, and an
+// F8 hotkey to jump into the stack. When a toast ends for ANY reason this emits `dismiss`
+// so the owner (useToasts) drops it.
+import type { HTMLAttributes } from 'vue'
+import { ToastClose, ToastDescription, ToastProvider, ToastRoot, ToastViewport } from 'reka-ui'
+import { cva } from 'class-variance-authority'
+import type { Toast, ToastType } from '../composables/useToasts'
+import { cn } from '../lib/cn'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     toasts: Toast[]
-    /** Show a per-toast dismiss button that emits `dismiss`. Wire it to `useToasts().dismiss`. */
+    /** Show a per-toast close button. Timeout and swipe dismissal work either way. */
     dismissible?: boolean
+    class?: HTMLAttributes['class']
   }>(),
   { dismissible: true },
 )
 
 const emit = defineEmits<{ dismiss: [id: number] }>()
+
+const iconVariants = cva('flex size-6 shrink-0 items-center justify-center rounded-full', {
+  variants: {
+    type: {
+      success: 'bg-success/15 text-success',
+      error: 'bg-error/15 text-error',
+      warning: 'bg-warning/15 text-warning',
+      info: 'bg-primary/15 text-primary',
+    } satisfies Record<ToastType, string>,
+  },
+})
+
+function onOpenChange(id: number, open: boolean) {
+  if (!open) emit('dismiss', id)
+}
 </script>
 
 <template>
-  <div class="nv-toast-container">
-    <TransitionGroup name="nv-toast-list">
-      <div
-        v-for="toast in toasts"
-        :key="toast.id"
-        :class="['nv-toast', `nv-toast--${toast.type}`]"
-        role="status"
-      >
-        <div class="nv-toast__icon">
-          <svg v-if="toast.type === 'success'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-          <svg v-else-if="toast.type === 'error'" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-          <svg v-else aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-        </div>
-        <span class="nv-toast__msg">{{ toast.msg }}</span>
-        <button
-          v-if="dismissible"
-          type="button"
-          class="nv-toast__close"
-          aria-label="Dismiss notification"
-          @click="emit('dismiss', toast.id)"
-        >
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-        </button>
+  <ToastProvider swipe-direction="right">
+    <ToastRoot
+      v-for="toast in toasts"
+      :key="toast.id"
+      :duration="toast.duration"
+      :type="toast.type === 'error' ? 'foreground' : 'background'"
+      class="flex items-center gap-4 rounded-lg border border-border-strong bg-bg-modal px-6 py-4 text-sm font-bold text-fg shadow-xl data-[state=closed]:animate-toast-out data-[state=open]:animate-toast-in data-[swipe=move]:translate-x-(--reka-toast-swipe-move-x) data-[swipe=end]:animate-toast-out"
+      @update:open="onOpenChange(toast.id, $event)"
+    >
+      <div :class="iconVariants({ type: toast.type })" aria-hidden="true">
+        <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        <svg v-else-if="toast.type === 'error'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        <svg v-else-if="toast.type === 'warning'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="11" x2="12" y2="16" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
       </div>
-    </TransitionGroup>
-  </div>
+      <ToastDescription class="flex-auto">{{ toast.msg }}</ToastDescription>
+      <ToastClose
+        v-if="dismissible"
+        aria-label="Dismiss notification"
+        class="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-sm text-fg-dim transition hover:bg-surface-hover hover:text-fg"
+      >
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+      </ToastClose>
+    </ToastRoot>
+
+    <ToastViewport
+      :class="cn('fixed end-8 bottom-8 z-(--z-toast) m-0 flex list-none flex-col gap-3 p-0 outline-none', props.class)"
+    />
+  </ToastProvider>
 </template>
-
-<style scoped>
-.nv-toast-container {
-  position: fixed;
-  inset-block-end: var(--space-8);
-  inset-inline-end: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  z-index: var(--z-toast);
-}
-
-.nv-toast {
-  background: var(--bg-modal);
-  border: 1px solid var(--border-alt);
-  padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  font-weight: 700;
-  font-size: var(--text-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  color: var(--text);
-}
-
-.nv-toast__icon {
-  width: var(--space-6);
-  height: var(--space-6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.nv-toast__msg {
-  flex: 1 1 auto;
-}
-
-.nv-toast__close {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--space-6);
-  height: var(--space-6);
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--text-dim);
-  cursor: pointer;
-  transition: var(--transition);
-}
-.nv-toast__close:hover {
-  background: var(--surface-hover);
-  color: var(--text);
-}
-
-.nv-toast--success .nv-toast__icon {
-  background: var(--status-bg-success);
-  color: var(--success);
-}
-.nv-toast--error .nv-toast__icon {
-  background: var(--status-bg-error);
-  color: var(--error);
-}
-.nv-toast--warning .nv-toast__icon,
-.nv-toast--info .nv-toast__icon {
-  background: var(--status-bg-warning);
-  color: var(--warning);
-}
-
-.nv-toast-list-enter-active,
-.nv-toast-list-leave-active {
-  transition: all 0.3s ease;
-}
-.nv-toast-list-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.nv-toast-list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

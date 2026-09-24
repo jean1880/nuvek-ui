@@ -2,50 +2,38 @@
 // Surface primitive only — NO intrinsic padding (MUI-"Card" model). Padding
 // lives in CardHeader / CardBody / CardFooter so a card can hold flush regions
 // (media, tables, split headers). Simple case: <Card><CardBody>…</CardBody></Card>.
-withDefaults(
+import type { HTMLAttributes } from 'vue'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '../lib/cn'
+
+const cardVariants = cva('relative overflow-hidden rounded-lg border border-border transition', {
+  variants: {
+    variant: {
+      elevated: 'bg-linear-145 from-surface to-bg-alt shadow-card',
+      outlined: 'bg-surface',
+    },
+    hoverable: {
+      true: 'hover:-translate-y-1 hover:border-border-strong hover:bg-surface-hover hover:bg-none hover:shadow-xl',
+      false: '',
+    },
+  },
+  defaultVariants: { variant: 'elevated', hoverable: false },
+})
+
+type CardVariants = VariantProps<typeof cardVariants>
+
+const props = withDefaults(
   defineProps<{
-    variant?: 'elevated' | 'outlined'
+    variant?: NonNullable<CardVariants['variant']>
     hoverable?: boolean
+    class?: HTMLAttributes['class']
   }>(),
   { variant: 'elevated', hoverable: false },
 )
 </script>
 
 <template>
-  <div
-    :class="[
-      'nv-card',
-      `nv-card--${variant}`,
-      { 'nv-card--hoverable': hoverable },
-    ]"
-  >
+  <div :class="cn(cardVariants({ variant, hoverable }), props.class)">
     <slot />
   </div>
 </template>
-
-<style scoped>
-.nv-card {
-  position: relative;
-  border-radius: var(--card-radius);
-  overflow: hidden;
-  transition: var(--transition);
-}
-
-.nv-card--elevated {
-  background: linear-gradient(145deg, var(--surface), var(--bg-alt));
-  border: 1px solid var(--border);
-  box-shadow: var(--card-shadow);
-}
-
-.nv-card--outlined {
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.nv-card--hoverable:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-alt);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-}
-</style>

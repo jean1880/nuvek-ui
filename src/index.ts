@@ -1,9 +1,11 @@
-// nuvek-ui public entry — shared design tokens, base styles, and Vue components.
-// Consuming apps: `import '@nuvek/ui/style.css'` for tokens+base, and
-// `import { Button, Chip, Card, ... } from '@nuvek/ui'` for components.
-import './style.css'
+// nuvek-ui public entry — Reka UI-based Vue components styled with Tailwind utilities.
+// Styling is NOT bundled: the consumer's Tailwind build generates it from these components'
+// class strings. Consuming apps wire it once in their stylesheet:
+//   @import "tailwindcss";
+//   @import "@nuvek/ui/theme.css";
+// then `import { Button, Chip, Card, ... } from '@nuvek/ui'`.
 
-export const version = '0.3.0'
+export const version = '1.0.0'
 
 // Components
 export { default as Button } from './components/Button.vue'
@@ -21,4 +23,6 @@ export { useToasts } from './composables/useToasts'
 export type { Toast, ToastType } from './composables/useToasts'
 export { useTheme } from './composables/useTheme'
 export type { Theme } from './composables/useTheme'
-export { useFocusTrap } from './composables/useFocusTrap'
+
+// Utilities
+export { cn } from './lib/cn'

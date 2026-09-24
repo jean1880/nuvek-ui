@@ -1,34 +1,17 @@
 <script setup lang="ts">
 // Padded card region with a bottom divider. Default slot for the title cluster;
-// #actions slot for trailing controls (right-aligned via :has-aware layout).
+// #actions slot for trailing controls.
+import type { HTMLAttributes } from 'vue'
+import { cn } from '../lib/cn'
+
+const props = defineProps<{ class?: HTMLAttributes['class'] }>()
 </script>
 
 <template>
-  <div class="nv-card-header">
-    <div class="nv-card-header__lead"><slot /></div>
-    <div v-if="$slots.actions" class="nv-card-header__actions">
+  <div :class="cn('flex items-center gap-4 border-b border-border px-6 py-4', props.class)">
+    <div class="min-w-0 flex-1"><slot /></div>
+    <div v-if="$slots.actions" class="flex shrink-0 items-center gap-2">
       <slot name="actions" />
     </div>
   </div>
 </template>
-
-<style scoped>
-.nv-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding-block: var(--space-4);
-  padding-inline: var(--space-6);
-  border-block-end: 1px solid var(--border);
-}
-.nv-card-header__lead {
-  min-inline-size: 0;
-  flex: 1;
-}
-.nv-card-header__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-</style>
