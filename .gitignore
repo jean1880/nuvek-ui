@@ -4,6 +4,7 @@ dist/
 .DS_Store
 
 # Local AI-assistant context. Deployment-specific notes must not be published.
+AGENTS.md
 CLAUDE.md
 .claude/
 .vite/
