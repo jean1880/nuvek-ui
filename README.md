@@ -1,5 +1,7 @@
 # @nuvek/ui
 
+[![CI](https://github.com/jean1880/nuvek-ui/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jean1880/nuvek-ui/actions/workflows/ci.yml)
+
 Shared design system for nuvek homelab services: a **Tailwind v4 theme** (the design tokens) and
 **headless Vue 3 components** built on [Reka UI](https://reka-ui.com) primitives and styled with
 Tailwind utilities. One source of visual truth so every service (`debian-maintainer`,
