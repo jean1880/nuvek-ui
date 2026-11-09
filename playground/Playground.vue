@@ -7,9 +7,21 @@ import {
   CardFooter,
   CardHeader,
   Chip,
+  Drawer,
   Modal,
   Panel,
+  Avatar,
+  ProgressBar,
+  SearchField,
+  Skeleton,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  TextField,
   ToastStack,
+  Tooltip,
+  TooltipProvider,
   useToasts,
 } from '../src'
 
@@ -17,6 +29,13 @@ const colors = ['success', 'error', 'warning', 'running', 'idle', 'neutral'] as 
 const chipVariants = ['soft', 'filled', 'outlined'] as const
 
 const modalOpen = ref(false)
+const drawerSide = ref<'right' | 'left' | null>(null)
+const tab = ref('one')
+const text = ref('')
+const search = ref('query')
+const sides = ['top', 'right', 'bottom', 'left'] as const
+const intents = ['primary', 'success', 'warning', 'error'] as const
+const sizes = ['sm', 'md', 'lg'] as const
 const { toasts, showToast, dismiss } = useToasts()
 </script>
 
@@ -64,6 +83,79 @@ const { toasts, showToast, dismiss } = useToasts()
         <Button variant="ghost" @click="showToast('Saved')">Success toast</Button>
         <Button variant="ghost" @click="showToast('Failed', 'error')">Error toast</Button>
         <Button variant="ghost" @click="showToast('Heads up', 'warning')">Warning toast</Button>
+      </div>
+    </Panel>
+
+    <TooltipProvider>
+      <Panel title="Tabs">
+        <Tabs v-model="tab">
+          <TabsList>
+            <TabsTrigger value="one">One</TabsTrigger>
+            <TabsTrigger value="two">Two</TabsTrigger>
+            <TabsTrigger value="three" disabled>Disabled</TabsTrigger>
+          </TabsList>
+          <TabsContent value="one">First panel ({{ tab }}).</TabsContent>
+          <TabsContent value="two">Second panel.</TabsContent>
+        </Tabs>
+      </Panel>
+
+      <Panel title="Tooltip">
+        <div class="flex flex-wrap gap-3">
+          <Tooltip v-for="s in sides" :key="s" :side="s" content="Tooltip text">
+            <Button variant="ghost">{{ s }}</Button>
+          </Tooltip>
+          <Tooltip content="No delay" :delay="0"><Button variant="ghost">delay 0</Button></Tooltip>
+        </div>
+      </Panel>
+    </TooltipProvider>
+
+    <Panel title="Drawer">
+      <div class="flex flex-wrap gap-3">
+        <Button @click="drawerSide = 'right'">Right drawer</Button>
+        <Button variant="ghost" @click="drawerSide = 'left'">Left drawer</Button>
+      </div>
+    </Panel>
+    <Drawer :open="drawerSide !== null" :side="drawerSide ?? 'right'" title="Drawer" @close="drawerSide = null">
+      Drawer body.
+      <template #footer><Button variant="ghost" @click="drawerSide = null">Close</Button></template>
+    </Drawer>
+
+    <Panel title="Fields">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <TextField v-model="text" label="Labelled" placeholder="Type here" />
+        <TextField v-model="text" placeholder="Placeholder only (aria-label)" />
+        <TextField v-model="text" label="Password" type="password" />
+        <TextField v-model="text" label="Disabled" disabled />
+        <SearchField v-model="search" label="Search" placeholder="Search…" />
+        <SearchField v-model="search" placeholder="Search without label" />
+        <SearchField v-model="search" label="Disabled search" disabled />
+        <SearchField v-model="text" placeholder="Empty (no clear button)" />
+      </div>
+    </Panel>
+
+    <Panel title="Skeleton">
+      <div class="flex items-center gap-3">
+        <Skeleton class="size-12 rounded-full" />
+        <div class="flex flex-col gap-2">
+          <Skeleton class="h-4 w-48" />
+          <Skeleton class="h-4 w-32" />
+        </div>
+      </div>
+    </Panel>
+
+    <Panel title="Avatar">
+      <div class="flex flex-wrap items-center gap-3">
+        <Avatar v-for="s in sizes" :key="s" :size="s" name="Ada Lovelace" />
+        <Avatar name="plato" />
+        <Avatar name="Broken Image" src="https://example.invalid/missing.png" />
+      </div>
+    </Panel>
+
+    <Panel title="ProgressBar">
+      <div class="flex flex-col gap-3">
+        <ProgressBar v-for="i in intents" :key="i" :intent="i" :value="60" :max="100" :label="i" />
+        <ProgressBar :value="0" :max="10" label="Empty" />
+        <ProgressBar :value="25" :max="10" label="Clamped to max" />
       </div>
     </Panel>
 

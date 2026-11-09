@@ -92,6 +92,18 @@ replaces the button's `px-4` rather than fighting it.
 | `Panel` | `title?` | default · `header` | — |
 | `Modal` | `open?` · `title?` · `ariaLabel?` (name when there is no title) · `closeOnBackdrop?` · `closeOnEsc?` | default · `header` · `footer` | `close` |
 | `ToastStack` | `toasts: Toast[]` · `dismissible?` (close button) | — | `dismiss` (id) |
+| `Tabs` | `v-model: string` (active tab value) | default (`TabsList` + `TabsContent`) | `update:modelValue` |
+| `TabsList` | — | default (`TabsTrigger`s) | — |
+| `TabsTrigger` | `value: string` · `disabled?` | default | — |
+| `TabsContent` | `value: string` | default | — |
+| `Tooltip` | `content: string` · `side?: 'top' \| 'right' \| 'bottom' \| 'left'` (default `top`) · `delay?: number` (ms) | default (the trigger element) | — |
+| `TooltipProvider` | Reka's provider, re-exported (`delayDuration?`, `skipDelayDuration?`) | default | — |
+| `Drawer` | `open: boolean` · `side?: 'right' \| 'left'` (default `right`) · `title?` · `ariaLabel?` (name when there is no title) | default · `header` · `footer` | `close` |
+| `TextField` | `v-model: string` · `placeholder?` · `type?` (default `text`) · `label?` · `disabled?` · `id?` | — | `update:modelValue`; other attrs fall through to the `<input>` |
+| `SearchField` | same as `TextField` | — | `update:modelValue` · `clear` |
+| `Skeleton` | — (size it with `class`) | — | — |
+| `Avatar` | `name: string` · `src?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`) | — | — |
+| `ProgressBar` | `value: number` · `max: number` · `intent?: 'primary' \| 'success' \| 'warning' \| 'error'` (default `primary`) · `label?` | — | — |
 
 - `Button` with `as="a"` (or `asChild` around a `RouterLink`) drops `type`/`disabled` and uses
   `aria-disabled` instead.
@@ -99,6 +111,20 @@ replaces the button's `px-4` rather than fighting it.
   its title. The component is controlled — flip `open` in response to `close`.
 - `ToastStack` is a Reka `Toast` region: errors announce assertively, others politely; the
   timer pauses on hover/focus; swipe right to dismiss; F8 focuses the stack.
+
+- `Tooltip` needs a `TooltipProvider` ancestor: **wrap your app root in one once**
+  (`<TooltipProvider><App /></TooltipProvider>`); it shares open delays between tooltips.
+  Tooltips open on hover and keyboard focus and close on Esc.
+- `Drawer` is a Reka `Dialog` styled as a side sheet, controlled like `Modal`: portalled,
+  focus-trapped, scroll-locked; Esc and overlay click emit `close`.
+- `TextField` / `SearchField` label the input with `label`, or with `placeholder` as `aria-label`
+  when there is none. `SearchField` shows a clear button while non-empty: it sets the value to `''`
+  and emits `clear`.
+- `Skeleton` is `aria-hidden` and uses `animate-shimmer` (motion-safe only).
+- `Avatar` shows the image (`alt` = `name`), or the initials of the first two words of `name`
+  when `src` is missing or fails to load.
+- `ProgressBar` clamps `value` to `0..max` and is announced as a `progressbar`
+  (`aria-valuenow` / `aria-valuemax`); `label` becomes its accessible name.
 
 ### Composables and utilities
 
