@@ -99,8 +99,8 @@ replaces the button's `px-4` rather than fighting it.
 | `Tooltip` | `content: string` · `side?: 'top' \| 'right' \| 'bottom' \| 'left'` (default `top`) · `delay?: number` (ms) | default (the trigger element) | — |
 | `TooltipProvider` | Reka's provider, re-exported (`delayDuration?`, `skipDelayDuration?`) | default | — |
 | `Drawer` | `open: boolean` · `side?: 'right' \| 'left'` (default `right`) · `title?` · `ariaLabel?` (name when there is no title) | default · `header` · `footer` | `close` |
-| `TextField` | `v-model: string` · `placeholder?` · `type?` (default `text`) · `label?` · `disabled?` · `id?` | — | `update:modelValue`; other attrs fall through to the `<input>` |
-| `SearchField` | same as `TextField` | — | `update:modelValue` · `clear` |
+| `TextField` | `v-model: string` · `placeholder?` · `type?` (default `text`) · `label?` · `disabled?` · `id?` | `leading` · `trailing` (overlaid inside the input; padding added when filled) | `update:modelValue`; other attrs fall through to the `<input>` |
+| `SearchField` | same as `TextField` plus `clearLabel?` (default `Clear`, the clear button's accessible name) | — | `update:modelValue` · `clear` |
 | `Skeleton` | — (size it with `class`) | — | — |
 | `Avatar` | `name: string` · `src?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`) | — | — |
 | `ProgressBar` | `value: number` · `max: number` · `intent?: 'primary' \| 'success' \| 'warning' \| 'error'` (default `primary`) · `label?` | — | — |

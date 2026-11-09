@@ -32,21 +32,23 @@ const props = withDefaults(
 )
 
 // First character of the first two words; Array.from keeps surrogate pairs whole.
-const initials = computed(() =>
-  props.name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => Array.from(word)[0])
-    .join('')
-    .toUpperCase(),
+const initials = computed(
+  () =>
+    props.name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => Array.from(word)[0])
+      .join('')
+      .toUpperCase() || '?',
 )
+const accessibleName = computed(() => props.name.trim() || 'Unknown')
 </script>
 
 <template>
   <AvatarRoot :class="cn(avatarVariants({ size }), props.class)">
     <AvatarImage v-if="src" :src="src" :alt="name" class="size-full object-cover" />
-    <AvatarFallback :aria-label="name" role="img">{{ initials }}</AvatarFallback>
+    <AvatarFallback :aria-label="accessibleName" role="img">{{ initials }}</AvatarFallback>
   </AvatarRoot>
 </template>

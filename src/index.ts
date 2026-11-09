@@ -22,7 +22,7 @@ export { default as TabsList } from './components/TabsList.vue'
 export { default as TabsTrigger } from './components/TabsTrigger.vue'
 export { default as TabsContent } from './components/TabsContent.vue'
 export { default as Tooltip } from './components/Tooltip.vue'
-// Re-exported so apps wrap their root once: <TooltipProvider><App /></TooltipProvider>.
+// Tooltip requires one TooltipProvider ancestor: wrap the app root once, <TooltipProvider><App /></TooltipProvider>.
 export { TooltipProvider } from 'reka-ui'
 export { default as Drawer } from './components/Drawer.vue'
 export { default as TextField } from './components/TextField.vue'

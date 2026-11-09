@@ -201,6 +201,31 @@ describe.each([
   })
 })
 
+describe('TextField slots and focus', () => {
+  it('pads for leading/trailing slots only when filled', () => {
+    wrapper = mount(TextField, { props: { modelValue: '' } })
+    expect(wrapper.find('input').classes()).not.toContain('ps-9')
+    wrapper.unmount()
+    wrapper = mount(TextField, {
+      props: { modelValue: '' },
+      slots: { leading: '<i id="l"/>', trailing: '<i id="t"/>' },
+    })
+    expect(wrapper.find('input').classes()).toEqual(expect.arrayContaining(['ps-9', 'pe-9']))
+    expect(wrapper.find('#l').exists() && wrapper.find('#t').exists()).toBe(true)
+  })
+
+  it('does not suppress the theme focus-visible ring', () => {
+    wrapper = mount(TextField, { props: { modelValue: '' } })
+    const cls = wrapper.find('input').classes().join(' ')
+    expect(cls).not.toMatch(/outline|ring-0|focus:/)
+  })
+
+  it('clearLabel names the SearchField clear button', () => {
+    wrapper = mount(SearchField, { props: { modelValue: 'a', clearLabel: 'Effacer' } })
+    expect(wrapper.find('button').attributes('aria-label')).toBe('Effacer')
+  })
+})
+
 describe('TextField a11y', () => {
   it('falls back to the placeholder as aria-label without a label', () => {
     wrapper = mount(TextField, { props: { modelValue: '', placeholder: 'Email' } })
@@ -209,12 +234,13 @@ describe('TextField a11y', () => {
 })
 
 describe('SearchField', () => {
-  it('names the input from label, else placeholder', () => {
+  it('names the input from the visible label, else placeholder as aria-label', () => {
     wrapper = mount(SearchField, { props: { modelValue: '', placeholder: 'Search' } })
     expect(wrapper.find('input').attributes('aria-label')).toBe('Search')
     wrapper.unmount()
     wrapper = mount(SearchField, { props: { modelValue: '', label: 'Find', placeholder: 'Search' } })
-    expect(wrapper.find('input').attributes('aria-label')).toBe('Find')
+    expect(wrapper.find('input').attributes('aria-label')).toBeUndefined()
+    expect(wrapper.find('label').text()).toBe('Find')
   })
 
   it('hides the clear button when empty and has an aria-hidden icon', () => {
@@ -256,6 +282,13 @@ describe('Avatar', () => {
     wrapper = mount(Avatar, { props: { name } })
     await settle()
     expect(wrapper.text()).toBe(expected.toUpperCase())
+  })
+
+  it.each(['', '   '])('empty name %j falls back to ? with a non-empty label', async (name) => {
+    wrapper = mount(Avatar, { props: { name } })
+    await settle()
+    expect(wrapper.text()).toBe('?')
+    expect(wrapper.find('[role="img"]').attributes('aria-label')).toBeTruthy()
   })
 
   // Reka probes the URL with a detached `new window.Image()`; capture it to fire its events.
