@@ -26,7 +26,7 @@ function ratio(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05)
 }
 
-const surfaces = ['bg', 'bg-alt', 'surface', 'surface-hover', 'surface-active']
+const surfaces = ['bg', 'bg-alt', 'bg-modal', 'surface', 'surface-hover', 'surface-active']
 
 describe('token contrast', () => {
   it.each(surfaces)('fg-dim has at least 4.5:1 on %s', (surface) => {
@@ -41,6 +41,17 @@ describe('token contrast', () => {
     for (const surface of surfaces) {
       expect(ratio(token('fg-muted'), token(surface))).toBeGreaterThanOrEqual(4.5)
     }
+  })
+
+  it('keeps fg fully readable on every surface', () => {
+    for (const surface of surfaces) {
+      expect(ratio(token('fg'), token(surface))).toBeGreaterThanOrEqual(7)
+    }
+  })
+
+  it('keeps dim, muted and fg visibly distinct from each other', () => {
+    expect(ratio(token('fg-muted'), token('fg-dim'))).toBeGreaterThanOrEqual(1.2)
+    expect(ratio(token('fg'), token('fg-muted'))).toBeGreaterThanOrEqual(1.2)
   })
 
   it('declares a dark colour-scheme and a forced-colours-safe focus outline', () => {
