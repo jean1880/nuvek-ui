@@ -20,7 +20,9 @@ const props = withDefaults(
     /** Class for the popup surface (the root renders no element of its own). */
     class?: HTMLAttributes['class']
   }>(),
-  { side: 'bottom', align: 'start' },
+  // `open` must default to undefined: Vue would cast an absent boolean to false and the menu
+  // would be stuck controlled-closed instead of managing its own state.
+  { open: undefined, side: 'bottom', align: 'start' },
 )
 
 defineEmits<{ 'update:open': [open: boolean] }>()

@@ -97,7 +97,9 @@ describe('DropdownMenu family', () => {
     expect(state.picked).toEqual(['rename'])
   })
 
-  it('shows a visible highlight (tint plus inset ring) and dark popup styling', async () => {
+  // Visibility itself is a CSS matter; the keyboard test above proves the state that drives it
+  // (`data-highlighted`). This only pins the classes that style that state.
+  it('styles the highlighted state with a tint plus an inset ring, on a dark popup', async () => {
     mountMenu()
     await settle()
     const item = document.querySelector('[role="menuitem"]')?.className ?? ''
@@ -117,5 +119,64 @@ describe('DropdownMenu family', () => {
     await settle()
     expect(document.querySelector('[role="menu"]')).toBeNull()
     expect(document.body.textContent).toContain('Actions')
+  })
+})
+
+describe('DropdownMenu keyboard and uncontrolled use', () => {
+  const picked: string[] = []
+
+  function mountUncontrolled() {
+    picked.length = 0
+    wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(DropdownMenu, null, {
+            trigger: () => h('button', { type: 'button', id: 'trig' }, 'Actions'),
+            default: () => [
+              h(MenuItem, { onSelect: () => picked.push('first') }, () => 'First'),
+              h(MenuItem, { onSelect: () => picked.push('second') }, () => 'Second'),
+            ],
+          }),
+      }),
+      { attachTo: document.body },
+    )
+    return document.getElementById('trig') as HTMLElement
+  }
+
+  const key = (el: Element | null, k: string) =>
+    el?.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }))
+
+  it('opens uncontrolled from the keyboard, selects with Enter and returns focus to the trigger', async () => {
+    const trigger = mountUncontrolled()
+    expect(document.querySelector('[role="menu"]')).toBeNull()
+    trigger.focus()
+    key(trigger, 'ArrowDown')
+    await settle()
+    expect(document.querySelector('[role="menu"]')).not.toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+
+    key(document.activeElement, 'ArrowDown')
+    await settle()
+    const active = document.activeElement as HTMLElement
+    expect(active.getAttribute('role')).toBe('menuitem')
+    expect(active.hasAttribute('data-highlighted')).toBe(true)
+
+    key(active, 'Enter')
+    await settle()
+    expect(picked).toHaveLength(1)
+    expect(document.querySelector('[role="menu"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  it('closes on Escape and returns focus to the trigger', async () => {
+    const trigger = mountUncontrolled()
+    trigger.focus()
+    key(trigger, 'ArrowDown')
+    await settle()
+    expect(document.querySelector('[role="menu"]')).not.toBeNull()
+    key(document.activeElement, 'Escape')
+    await settle()
+    expect(document.querySelector('[role="menu"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
   })
 })
