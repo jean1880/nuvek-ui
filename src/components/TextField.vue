@@ -40,7 +40,7 @@ const autoId = useId()
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :aria-label="label ? undefined : placeholder"
+        :aria-label="(($attrs['aria-label'] as string | undefined) ?? (label ? undefined : placeholder))"
         :class="
           cn(
             'w-full rounded-md border border-border-strong bg-bg-alt px-3 py-2 text-sm text-fg transition placeholder:text-fg-dim disabled:cursor-not-allowed disabled:opacity-50',
