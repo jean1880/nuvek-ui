@@ -39,7 +39,7 @@ export { default as Avatar } from './components/Avatar.vue'
 export { default as ProgressBar } from './components/ProgressBar.vue'
 
 // Composables
-export { useToasts } from './composables/useToasts'
+export { useToasts, defaultToastDurations } from './composables/useToasts'
 export type { Toast, ToastType } from './composables/useToasts'
 export { useTheme } from './composables/useTheme'
 export type { Theme } from './composables/useTheme'

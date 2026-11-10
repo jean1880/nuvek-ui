@@ -12,7 +12,10 @@ import { cn } from '../lib/cn'
 const props = withDefaults(
   defineProps<{
     toasts: Toast[]
-    /** Show a per-toast close button. Timeout and swipe dismissal work either way. */
+    /**
+     * Show a per-toast close button. Timeout and swipe dismissal work either way, and a toast
+     * that never times out always gets one.
+     */
     dismissible?: boolean
     class?: HTMLAttributes['class']
   }>(),
@@ -55,7 +58,7 @@ function onOpenChange(id: number, open: boolean) {
       </div>
       <ToastDescription class="flex-auto">{{ toast.msg }}</ToastDescription>
       <ToastClose
-        v-if="dismissible"
+        v-if="dismissible || !Number.isFinite(toast.duration)"
         aria-label="Dismiss notification"
         class="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-sm text-fg-dim transition hover:bg-surface-hover hover:text-fg"
       >
