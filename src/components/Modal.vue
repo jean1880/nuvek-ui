@@ -12,6 +12,7 @@ import {
   VisuallyHidden,
 } from 'reka-ui'
 import { cn } from '../lib/cn'
+import DialogCloseButton from './DialogCloseButton.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -21,9 +22,13 @@ const props = withDefaults(
     ariaLabel?: string
     closeOnBackdrop?: boolean
     closeOnEsc?: boolean
+    /** Show a visible close button (Esc and backdrop dismissal work either way). */
+    closable?: boolean
+    /** Accessible name of the close button. */
+    closeLabel?: string
     class?: HTMLAttributes['class']
   }>(),
-  { open: false, closeOnBackdrop: true, closeOnEsc: true },
+  { open: false, closeOnBackdrop: true, closeOnEsc: true, closable: false, closeLabel: 'Close' },
 )
 
 const emit = defineEmits<{ close: [] }>()
@@ -61,16 +66,21 @@ function onEsc(e: KeyboardEvent) {
         @focus-outside="onOutside"
         @escape-key-down="onEsc"
       >
-        <DialogTitle
+        <header
           v-if="title || $slots.header"
-          as="header"
-          class="border-b border-border px-6 py-4 text-lg font-bold text-fg"
+          class="flex items-center justify-between gap-4 border-b border-border px-6 py-4 text-lg font-bold text-fg"
         >
-          <slot name="header">{{ title }}</slot>
-        </DialogTitle>
-        <VisuallyHidden v-else>
-          <DialogTitle>{{ ariaLabel }}</DialogTitle>
-        </VisuallyHidden>
+          <DialogTitle as="h2" class="min-w-0 text-lg font-bold">
+            <slot name="header">{{ title }}</slot>
+          </DialogTitle>
+          <DialogCloseButton v-if="closable" :label="closeLabel" />
+        </header>
+        <template v-else>
+          <VisuallyHidden>
+            <DialogTitle>{{ ariaLabel }}</DialogTitle>
+          </VisuallyHidden>
+          <DialogCloseButton v-if="closable" :label="closeLabel" class="absolute end-3 top-3" />
+        </template>
 
         <div class="overflow-y-auto p-6">
           <slot />

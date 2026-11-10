@@ -12,6 +12,7 @@ import {
 } from 'reka-ui'
 import { cva } from 'class-variance-authority'
 import { cn } from '../lib/cn'
+import DialogCloseButton from './DialogCloseButton.vue'
 
 const drawerVariants = cva(
   'fixed inset-y-0 z-(--z-modal) flex w-full max-w-md flex-col overflow-hidden border-border-strong bg-bg-modal shadow-xl focus:outline-none',
@@ -34,9 +35,13 @@ const props = withDefaults(
     title?: string
     /** Accessible name used when neither `title` nor a `header` slot is provided. */
     ariaLabel?: string
+    /** Show a visible close button (Esc and overlay dismissal work either way). */
+    closable?: boolean
+    /** Accessible name of the close button. */
+    closeLabel?: string
     class?: HTMLAttributes['class']
   }>(),
-  { side: 'right' },
+  { side: 'right', closable: false, closeLabel: 'Close' },
 )
 
 const emit = defineEmits<{ close: [] }>()
@@ -56,16 +61,21 @@ function onOpenChange(next: boolean) {
         :aria-describedby="undefined"
         :class="cn(drawerVariants({ side }), props.class)"
       >
-        <DialogTitle
+        <header
           v-if="title || $slots.header"
-          as="header"
-          class="border-b border-border px-6 py-4 text-lg font-bold text-fg"
+          class="flex items-center justify-between gap-4 border-b border-border px-6 py-4 text-lg font-bold text-fg"
         >
-          <slot name="header">{{ title }}</slot>
-        </DialogTitle>
-        <VisuallyHidden v-else>
-          <DialogTitle>{{ ariaLabel }}</DialogTitle>
-        </VisuallyHidden>
+          <DialogTitle as="h2" class="min-w-0 text-lg font-bold">
+            <slot name="header">{{ title }}</slot>
+          </DialogTitle>
+          <DialogCloseButton v-if="closable" :label="closeLabel" />
+        </header>
+        <template v-else>
+          <VisuallyHidden>
+            <DialogTitle>{{ ariaLabel }}</DialogTitle>
+          </VisuallyHidden>
+          <DialogCloseButton v-if="closable" :label="closeLabel" class="absolute end-3 top-3" />
+        </template>
 
         <div class="flex-1 overflow-y-auto p-6">
           <slot />
