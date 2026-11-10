@@ -33,17 +33,17 @@
     /* Surfaces */
     --color-surface: #0f172a;
     --color-surface-hover: #1e293b;
-    --color-surface-active: #334155;
+    --color-surface-active: #283549;
 
     /* Foreground (text) — `text-fg`, `text-fg-muted`, `text-fg-dim` */
     --color-fg: #f1f5f9;
     --color-fg-muted: #94a3b8;
-    --color-fg-dim: #64748b;
+    --color-fg-dim: #909eb3;
     --color-on-primary: #ffffff;
 
     /* Borders — `border-border`, `border-border-strong` */
     --color-border: #1e293b;
-    --color-border-strong: #334155;
+    --color-border-strong: #728198;
 
     /* Semantic intent. Tints come from opacity modifiers: `bg-primary/10`. */
     --color-primary: #38bdf8;
@@ -167,6 +167,9 @@
 
 /* Stacking scale — not a Tailwind namespace; use as `z-(--z-modal)`. */
 :root {
+    /* Dark-only: native controls (checkbox, select, number spinner, scrollbars) draw dark. */
+    color-scheme: dark;
+
     --z-dropdown: 1000;
     --z-sticky: 1100;
     --z-overlay: 1300;
@@ -185,7 +188,8 @@
     }
 
     :focus-visible {
-        outline: none;
+        /* Transparent, not none: forced-colours modes repaint it, so the ring survives. */
+        outline: 2px solid transparent;
         box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
     }
 
