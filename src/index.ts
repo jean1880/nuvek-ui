@@ -5,7 +5,7 @@
 //   @import "@nuvek/ui/theme.css";
 // then `import { Button, Chip, Card, ... } from '@nuvek/ui'`.
 
-export const version = '1.0.0'
+export const version = '1.2.0'
 
 // Components
 export { default as Button } from './components/Button.vue'

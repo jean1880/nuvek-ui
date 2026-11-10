@@ -10,7 +10,7 @@ Tailwind utilities. One source of visual truth so every service (`debian-maintai
 Homelab-internal — not published to npm. Consumed as a git-tag dependency:
 
 ```json
-"@nuvek/ui": "github:jean1880/nuvek-ui#v1.0.0"
+"@nuvek/ui": "github:jean1880/nuvek-ui#v1.2.0"
 ```
 
 ## How it fits together
@@ -25,7 +25,7 @@ Homelab-internal — not published to npm. Consumed as a git-tag dependency:
 ## Wiring a consumer
 
 ```bash
-npm install tailwindcss @tailwindcss/vite reka-ui "@nuvek/ui@github:jean1880/nuvek-ui#v1.0.0"
+npm install tailwindcss @tailwindcss/vite reka-ui "@nuvek/ui@github:jean1880/nuvek-ui#v1.2.0"
 ```
 
 ```ts
@@ -64,8 +64,14 @@ generates nothing. Tints come from opacity modifiers, not separate tokens.
 
 Spacing is Tailwind's default 0.25 rem scale (`p-4` = 1 rem).
 
-The base layer sets `body` colours/font, a primary `:focus-visible` ring, and a
-`prefers-reduced-motion` override.
+The base layer sets `body` colours/font, `color-scheme: dark` (native checkboxes, selects and
+spinners draw dark), a primary `:focus-visible` ring (with a transparent outline so it survives
+forced-colours modes), and a `prefers-reduced-motion` override.
+
+Contrast is enforced by a test that reads the tokens from `theme.css`: `fg-dim` is at least 4.5:1
+and `border-strong` at least 3:1 on `bg`, `bg-alt`, `surface`, `surface-hover` and `surface-active`.
+Use `border-strong` for the edge of a control (input, select, toggle) and `border` for decorative
+dividers only.
 
 ### Theming
 
@@ -86,11 +92,11 @@ replaces the button's `px-4` rather than fighting it.
 | Component | Props | Slots | Events |
 |-----------|-------|-------|--------|
 | `Button` | `variant?: 'primary' \| 'ghost' \| 'danger'` · `type?` (default `button`) · `disabled?` · `as?` (default `button`) · `asChild?` | default | native (`@click`) fall through |
-| `Chip` | `color?: 'success' \| 'error' \| 'warning' \| 'running' \| 'idle' \| 'neutral'` · `variant?: 'soft' \| 'filled' \| 'outlined'` · `size?: 'sm' \| 'md'` | default | — |
-| `Card` | `variant?: 'elevated' \| 'outlined'` · `hoverable?` — surface only, no padding | default | — |
+| `Chip` | `color?: 'success' \| 'error' \| 'warning' \| 'running' \| 'idle' \| 'neutral'` · `variant?: 'soft' \| 'filled' \| 'outlined'` · `size?: 'sm' \| 'md'` · `interactive?` (click/toggle target, at least 24 px tall) | default | — |
+| `Card` | `variant?: 'elevated' \| 'outlined'` · `hoverable?` · `interactive?` (rings the card when a child has keyboard focus) — surface only, no padding | default | — |
 | `CardHeader` / `CardBody` / `CardFooter` | — (padded regions with dividers) | default · `actions` (header) | — |
 | `Panel` | `title?` | default · `header` | — |
-| `Modal` | `open?` · `title?` · `ariaLabel?` (name when there is no title) · `closeOnBackdrop?` · `closeOnEsc?` | default · `header` · `footer` | `close` |
+| `Modal` | `open?` · `title?` · `ariaLabel?` (name when there is no title) · `closeOnBackdrop?` · `closeOnEsc?` · `closable?` (visible close button) · `closeLabel?` (default `Close`) | default · `header` · `footer` | `close` |
 | `ToastStack` | `toasts: Toast[]` · `dismissible?` (close button) | — | `dismiss` (id) |
 | `Tabs` | `v-model: string` (active tab value) | default (`TabsList` + `TabsContent`) | `update:modelValue` |
 | `TabsList` | — | default (`TabsTrigger`s) | — |
@@ -98,12 +104,17 @@ replaces the button's `px-4` rather than fighting it.
 | `TabsContent` | `value: string` | default | — |
 | `Tooltip` | `content: string` · `side?: 'top' \| 'right' \| 'bottom' \| 'left'` (default `top`) · `delay?: number` (ms) | default (the trigger element) | — |
 | `TooltipProvider` | Reka's provider, re-exported (`delayDuration?`, `skipDelayDuration?`) | default | — |
-| `Drawer` | `open: boolean` · `side?: 'right' \| 'left'` (default `right`) · `title?` · `ariaLabel?` (name when there is no title) | default · `header` · `footer` | `close` |
+| `Drawer` | `open: boolean` · `side?: 'right' \| 'left'` (default `right`) · `title?` · `ariaLabel?` (name when there is no title) · `closable?` · `closeLabel?` | default · `header` · `footer` | `close` |
+| `DropdownMenu` | `open?` · `side?` · `align?` · `class?` (popup surface) | `trigger` (the opening element) · default (menu rows) | `update:open` |
+| `MenuItem` | `disabled?` | default | `select` |
+| `MenuRadioGroup` / `MenuRadioItem` | group `v-model: string`; item `value: string` · `disabled?` | default | `update:modelValue` · `select` |
+| `MenuCheckboxItem` | `v-model: boolean` · `disabled?` | default | `update:modelValue` · `select` |
+| `MenuSeparator` / `MenuLabel` | — | default (label) | — |
 | `TextField` | `v-model: string` · `placeholder?` · `type?` (default `text`) · `label?` · `disabled?` · `id?` | `leading` · `trailing` (overlaid inside the input; padding added when filled) | `update:modelValue`; other attrs fall through to the `<input>` |
 | `SearchField` | same as `TextField` plus `clearLabel?` (default `Clear`, the clear button's accessible name) | — | `update:modelValue` · `clear` |
 | `Skeleton` | — (size it with `class`) | — | — |
-| `Avatar` | `name: string` · `src?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`) | — | — |
-| `ProgressBar` | `value: number` · `max: number` · `intent?: 'primary' \| 'success' \| 'warning' \| 'error'` (default `primary`) · `label?` | — | — |
+| `Avatar` | `name: string` · `src?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`) · `decorative?` (hide it when the name is shown beside it) | — | — |
+| `ProgressBar` | `value: number` · `max: number` · `intent?: 'primary' \| 'success' \| 'warning' \| 'error'` (default `primary`) · `label?` (accessible name, default `Progress`; pass what is measured) | — | — |
 
 - `Button` with `as="a"` (or `asChild` around a `RouterLink`) drops `type`/`disabled` and uses
   `aria-disabled` instead.
@@ -118,8 +129,26 @@ replaces the button's `px-4` rather than fighting it.
 - `Drawer` is a Reka `Dialog` styled as a side sheet, controlled like `Modal`: portalled,
   focus-trapped, scroll-locked; Esc and overlay click emit `close`.
 - `TextField` / `SearchField` label the input with `label`, or with `placeholder` as `aria-label`
-  when there is none. `SearchField` shows a clear button while non-empty: it sets the value to `''`
+  when there is none; an `aria-label` you pass wins over both. `SearchField` shows a clear button while non-empty: it sets the value to `''`
   and emits `clear`.
+- `DropdownMenu` is a Reka dropdown menu (roving focus, typeahead, Esc, focus return). The
+  `trigger` slot is the element that opens it. The highlighted row is a tinted fill plus an inset
+  ring. Radio and checkbox rows expose `aria-checked`:
+
+  ```vue
+  <DropdownMenu>
+    <template #trigger><button type="button">Options</button></template>
+    <MenuRadioGroup v-model="sort">
+      <MenuRadioItem value="name">Name</MenuRadioItem>
+      <MenuRadioItem value="date">Date</MenuRadioItem>
+    </MenuRadioGroup>
+    <MenuSeparator />
+    <MenuCheckboxItem v-model="showHidden">Show hidden</MenuCheckboxItem>
+    <MenuItem @select="rename">Rename</MenuItem>
+  </DropdownMenu>
+  ```
+- A `Card` clips its children, so a full-bleed button inside it loses its focus ring. Set
+  `interactive` on such a card and the ring is drawn on the card itself.
 - `Skeleton` is `aria-hidden` and uses `animate-shimmer` (motion-safe only).
 - `Avatar` shows the image (`alt` = `name`), or the initials of the first two words of `name`
   when `src` is missing or fails to load.
@@ -128,14 +157,33 @@ replaces the button's `px-4` rather than fighting it.
 
 ### Composables and utilities
 
-- `useToasts(durationMs = 4000)` → `{ toasts, showToast(msg, type?), dismiss(id) }`, with
+- `useToasts(durations?)` → `{ toasts, showToast(msg, type?), dismiss(id) }`, with
   `ToastType = 'success' (default) | 'error' | 'warning' | 'info'` — e.g.
-  `showToast('Build failed', 'error')`. The stack
+  `showToast('Build failed', 'error')`. `durations` is one number for every type, or a per-type
+  map such as `{ error: 20000 }`. By default errors stay until dismissed (`Infinity`) and every
+  other type lasts 8 s; a toast that never times out always shows its dismiss button. The stack
   owns each toast's lifetime, so **wire both directions**:
   `<ToastStack :toasts="toasts" @dismiss="dismiss" />`.
 - `useTheme()` → `{ theme, setTheme(name), initTheme() }`.
 - `cn(...classes)` — clsx + tailwind-merge, configured for this theme's custom keys. Use it in
   your own components to get the same override behaviour.
+
+## Visual changes for consumers
+
+Bumping to v1.2.0 changes how existing UI looks, with no code change on your side:
+
+- **Lighter dim text.** `fg-dim` is lighter, so captions and placeholders read at 4.5:1 or better.
+- **Heavier strong borders.** `border-strong` is lighter, so input and control edges are visible
+  (3:1 or better). `surface-active` is slightly darker so both still hold on it.
+- **Dark native controls.** `color-scheme: dark` makes checkboxes, selects, number spinners and
+  scrollbars draw dark instead of light.
+- **Dialog headers.** A `Modal` or `Drawer` title renders as an `h2` inside the header.
+- **Progress track.** `ProgressBar` has a thin outline, and its default name is `Progress`.
+- **Toasts last longer.** Errors persist until dismissed; other toasts last 8 s (was 4 s).
+- **Danger button hover.** Text is dark on the filled hover state.
+
+Pass `label` to every `ProgressBar` so it has a meaningful name. New opt-ins: `Card interactive`,
+`Chip interactive`, `Avatar decorative`, `Modal`/`Drawer` `closable`.
 
 ## Develop
 
