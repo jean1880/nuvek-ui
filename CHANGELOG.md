@@ -13,7 +13,7 @@ Additive release.
 - `Combobox`: filterable select on Reka Combobox with the same field props. Single or `multiple`
   (removable chips in the field, named `Remove {label}`; Backspace on an empty input removes the
   last), type-to-filter, `allowCreate` (an `Add "text"` row that emits `create`), `loading` and
-  `search` for async options, `filter` to leave filtering to the caller, and an `empty` slot.
+  `search` for async options, `toggleLabel` for the chevron button's name, `filter` to leave filtering to the caller, and an `empty` slot.
 - `SelectOption` and `FieldSize` types.
 
 ## 1.2.0

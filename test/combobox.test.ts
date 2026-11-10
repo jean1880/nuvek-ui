@@ -31,10 +31,12 @@ const options: SelectOption[] = [
 ]
 
 const single = ref<string | number | (string | number)[] | undefined>(undefined)
+const opts = ref<SelectOption[]>(options)
 const events = { created: [] as string[], searched: [] as string[] }
 
 function mountCombobox(props: Record<string, unknown> = {}, slots: Record<string, () => unknown> = {}) {
   single.value = props.multiple ? [] : undefined
+  opts.value = options
   events.created = []
   events.searched = []
   wrapper = mount(
@@ -47,7 +49,7 @@ function mountCombobox(props: Record<string, unknown> = {}, slots: Record<string
             'onUpdate:modelValue': (v: string | number | (string | number)[]) => (single.value = v),
             onCreate: (v: string) => events.created.push(v),
             onSearch: (v: string) => events.searched.push(v),
-            options,
+            options: opts.value,
             label: 'Letter',
             placeholder: 'Find one',
             id: 'cb',
@@ -307,11 +309,84 @@ describe('Combobox multiple', () => {
     expect(removeButtons()).toHaveLength(0)
   })
 
-  it('keeps chip labels when async options no longer include the value', async () => {
+  it('keeps a selected chip label when async options no longer include the value', async () => {
     mountCombobox({ multiple: true })
     single.value = ['a']
     await settle()
-    wrapper?.setProps({})
+    opts.value = [{ value: 'z', label: 'Zulu' }]
+    await settle()
     expect(removeButtons().map((b) => b.getAttribute('aria-label'))).toEqual(['Remove Alpha'])
+  })
+
+  it('forgets the label of a value once it is neither an option nor selected', async () => {
+    mountCombobox({ multiple: true })
+    single.value = ['a']
+    await settle()
+    opts.value = [{ value: 'z', label: 'Zulu' }]
+    await settle()
+    single.value = []
+    await settle()
+    single.value = ['a']
+    await settle()
+    // The label was pruned, so the chip falls back to the raw value.
+    expect(removeButtons().map((b) => b.getAttribute('aria-label'))).toEqual(['Remove a'])
+  })
+})
+
+describe('Combobox keyboard filtering', () => {
+  const highlighted = () => document.querySelector('[data-highlighted]')?.textContent?.trim()
+
+  it('highlights the first match as you type, and Enter chooses it', async () => {
+    const input = mountCombobox()
+    await type(input, 'ch')
+    expect(optionTexts()).toEqual(['Charlie'])
+    expect(highlighted()).toBe('Charlie')
+    key(input, 'Enter')
+    await settle()
+    expect(single.value).toBe('c')
+  })
+
+  it('skips disabled options with the arrow keys and refuses to choose one', async () => {
+    const input = mountCombobox()
+    await type(input, 'a')
+    expect(optionTexts()).toEqual(['Alpha', 'Bravo', 'Charlie', 'Delta'])
+    expect(highlighted()).toBe('Alpha')
+    expect(optionByText('Bravo').hasAttribute('data-disabled')).toBe(true)
+    key(input, 'ArrowDown')
+    await settle()
+    expect(highlighted()).toBe('Charlie')
+    optionByText('Bravo').click()
+    await settle()
+    expect(single.value).toBeUndefined()
+  })
+})
+
+describe('Combobox toggle button', () => {
+  it('is named, out of the tab order, and opens the list', async () => {
+    mountCombobox()
+    const toggle = document.querySelector('button[aria-label="Show options"]') as HTMLElement
+    expect(toggle).not.toBeNull()
+    expect(toggle.getAttribute('tabindex')).toBe('-1')
+    expect(toggle.closest('[aria-hidden="true"]')).toBeNull()
+    toggle.click()
+    await settle()
+    expect(document.querySelector('[role="listbox"]')).not.toBeNull()
+  })
+
+  it('takes its name from toggleLabel', () => {
+    mountCombobox({ toggleLabel: 'Open list' })
+    expect(document.querySelector('button[aria-label="Open list"]')).not.toBeNull()
+  })
+})
+
+describe('Combobox loading row', () => {
+  it('appears after any stale options', async () => {
+    const input = mountCombobox({ loading: true })
+    input.focus()
+    key(input, 'ArrowDown')
+    await settle()
+    const viewport = document.querySelector('[role="status"]')?.parentElement as HTMLElement
+    expect(viewport.querySelectorAll('[role="option"]')).toHaveLength(4)
+    expect(viewport.lastElementChild?.getAttribute('role')).toBe('status')
   })
 })

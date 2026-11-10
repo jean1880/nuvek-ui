@@ -119,6 +119,18 @@ describe('Select', () => {
     expect(model.value).toBe('c')
   })
 
+  it('selects with a pointer: press the trigger, release, then release over an option', async () => {
+    const trigger = mountSelect()
+    trigger.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0 }))
+    await settle()
+    const charlie = [...document.querySelectorAll('[role="option"]')].find((o) => o.textContent?.includes('Charlie'))
+    // Reka swallows the release that ends the opening press; the next one selects.
+    for (let i = 0; i < 2; i++) charlie?.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, cancelable: true }))
+    await settle()
+    expect(model.value).toBe('c')
+    expect(document.querySelector('[role="listbox"]')).toBeNull()
+  })
+
   it('shows the selected option as the value', async () => {
     const trigger = mountSelect({ modelValue: 'c' })
     await settle()

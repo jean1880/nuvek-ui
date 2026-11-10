@@ -64,6 +64,8 @@ const props = withDefaults(
     loadingText?: string
     /** Prefix of each chip remove button's name: `{removeLabel} {chip label}`. */
     removeLabel?: string
+    /** Accessible name of the chevron button that toggles the list. */
+    toggleLabel?: string
     /** Format of the create row: `{value}` is replaced with the typed text. */
     createLabel?: string
     class?: HTMLAttributes['class']
@@ -75,6 +77,7 @@ const props = withDefaults(
     emptyText: 'No results',
     loadingText: 'Loading…',
     removeLabel: 'Remove',
+    toggleLabel: 'Show options',
     createLabel: 'Add "{value}"',
   },
 )
@@ -87,7 +90,9 @@ const emit = defineEmits<{
 
 defineSlots<{ empty?: (props: { query: string }) => unknown }>()
 
-const CREATE = '\u0000create'
+// Value of the create row: one module-level object, so it cannot equal any option value (those
+// are strings or numbers). The row's @select is prevented, so it never reaches the model.
+const CREATE = Object.freeze({ create: true })
 
 const { controlId, helpId, errorId, describedBy } = useFieldWiring({
   id: toRef(props, 'id'),
@@ -99,20 +104,29 @@ const open = ref(false)
 const query = ref('') // what the user typed (not the label echoed into the field)
 const inputText = ref('')
 
-// Labels of every option seen, so chips and the field keep their text when async options change.
-const seen = new Map<Value, string>()
-watch(
-  () => props.options,
-  (options) => options.forEach((o) => seen.set(o.value, o.label)),
-  { immediate: true, deep: true },
-)
-const labelOf = (value: Value) => seen.get(value) ?? String(value)
-
 const selected = computed<Value[]>(() => {
   const v = props.modelValue
   if (v === undefined || v === '') return []
   return Array.isArray(v) ? v : [v]
 })
+
+// Labels of the current options and of the selected values, so a chip (or the field text) keeps
+// its label after async options replace the list. Anything else is dropped.
+let seen = new Map<Value, string>()
+watch(
+  [() => props.options, selected],
+  ([options, chosen]) => {
+    const next = new Map<Value, string>()
+    for (const value of chosen) {
+      const label = seen.get(value)
+      if (label !== undefined) next.set(value, label)
+    }
+    for (const o of options) next.set(o.value, o.label)
+    seen = next
+  },
+  { immediate: true, deep: true },
+)
+const labelOf = (value: Value) => seen.get(value) ?? String(value)
 
 const visible = computed(() => {
   const q = query.value.trim().toLowerCase()
@@ -242,7 +256,8 @@ const displayValue = (value: unknown) =>
           @input="onInput"
           @keydown.backspace="onBackspace"
         />
-        <ComboboxTrigger tabindex="-1" aria-hidden="true" :disabled="disabled" class="shrink-0 text-fg-dim">
+        <!-- Pointer affordance only: keyboard users open the list from the input (arrows). -->
+        <ComboboxTrigger tabindex="-1" :aria-label="toggleLabel" :disabled="disabled" class="shrink-0 text-fg-dim">
           <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>

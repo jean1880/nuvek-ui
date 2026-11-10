@@ -114,7 +114,7 @@ replaces the button's `px-4` rather than fighting it.
 | `TextField` | `v-model: string` · `placeholder?` · `type?` (default `text`) · `label?` · `disabled?` · `id?` | `leading` · `trailing` (overlaid inside the input; padding added when filled) | `update:modelValue`; other attrs fall through to the `<input>` |
 | `SearchField` | same as `TextField` plus `clearLabel?` (default `Clear`, the clear button's accessible name) | — | `update:modelValue` · `clear` |
 | `Select` | `v-model: string \| number` · `options: { value, label, disabled?, group? }[]` · `placeholder?` · `label?` · `help?` · `error?` · `required?` · `disabled?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`, TextField's size) · `name?` · `id?` | — | `update:modelValue`; other attrs (e.g. `aria-label`) fall through to the trigger |
-| `Combobox` | `Select`'s props plus `multiple?` (`v-model` is then an array) · `allowCreate?` · `loading?` · `filter?` (default `true`; local filtering by label) · `emptyText?` · `loadingText?` · `removeLabel?` (default `Remove`) · `createLabel?` (default `Add "{value}"`) | `empty` (no matches) | `update:modelValue` · `search` (typed text) · `create` (text) |
+| `Combobox` | `Select`'s props plus `multiple?` (`v-model` is then an array) · `allowCreate?` · `loading?` · `filter?` (default `true`; local filtering by label) · `emptyText?` · `loadingText?` · `removeLabel?` (default `Remove`) · `toggleLabel?` (default `Show options`) · `createLabel?` (default `Add "{value}"`) | `empty` (no matches) | `update:modelValue` · `search` (typed text) · `create` (text) |
 | `Skeleton` | — (size it with `class`) | — | — |
 | `Avatar` | `name: string` · `src?` · `size?: 'sm' \| 'md' \| 'lg'` (default `md`) · `decorative?` (hide it when the name is shown beside it) | — | — |
 | `ProgressBar` | `value: number` · `max: number` · `intent?: 'primary' \| 'success' \| 'warning' \| 'error'` (default `primary`) · `label?` (accessible name, default `Progress`; pass what is measured) | — | — |
@@ -156,7 +156,10 @@ replaces the button's `px-4` rather than fighting it.
   ones first. The popup uses the menu surface, is portalled at `--z-popover` so it opens inside
   `Modal` and `Drawer`, and is as wide as the control.
 - `Combobox` filters locally on the label. For async results, handle `search`, set `loading`, swap
-  `options` and pass `:filter="false"`. `allowCreate` shows `Add "text"` for text that matches no
+  `options` and pass `:filter="false"`. The loading row is appended after whatever options are
+  still listed, so clear `options` when the previous results should not stay visible. The chevron
+  button is named by `toggleLabel` (default `Show options`) and is skipped by Tab; keyboard users
+  open the list from the input. `allowCreate` shows `Add "text"` for text that matches no
   option: choosing it emits `create` and leaves the value alone, so add the option and select it:
 
   ```vue
