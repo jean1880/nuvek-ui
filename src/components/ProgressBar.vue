@@ -40,9 +40,7 @@ const clamped = computed(() => {
 const percent = computed(() => (clamped.value / safeMax.value) * 100)
 
 // The name says what is measured; the value text carries the percentage.
-function valueLabel() {
-  return props.label
-}
+const name = computed(() => props.label || 'Progress')
 function valueText(value: number | null | undefined, max: number) {
   return typeof value === 'number' ? `${Math.round((value / max) * 100)}%` : undefined
 }
@@ -52,7 +50,7 @@ function valueText(value: number | null | undefined, max: number) {
   <ProgressRoot
     :model-value="clamped"
     :max="safeMax"
-    :get-value-label="valueLabel"
+    :get-value-label="() => name"
     :get-value-text="valueText"
     :class="
       cn(

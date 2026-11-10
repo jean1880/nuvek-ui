@@ -28,6 +28,9 @@ export const defaultToastDurations: Record<ToastType, number> = {
  *   const { toasts, showToast, dismiss } = useToasts()
  *   <ToastStack :toasts="toasts" @dismiss="dismiss" />
  *
+ * Persistent toasts use `Infinity`, which JSON cannot represent (it serialises to `null`), so
+ * do not round-trip the toast list through JSON.
+ *
  * `durations` is either one number applied to every type, or a partial per-type map
  * layered over the defaults (errors persistent, everything else 8 s).
  */
