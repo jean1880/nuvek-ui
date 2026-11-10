@@ -1,6 +1,6 @@
 {
   "name": "@nuvek/ui",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Shared nuvek design system — Tailwind v4 theme tokens and headless (Reka UI) Vue 3 components.",
   "type": "module",
   "files": [

@@ -46,8 +46,9 @@ describe('theme.css', () => {
     for (const m of css.matchAll(/(--[\w-]+)\s*:/g)) defined.add(m[1])
     for (const m of css.matchAll(/@property\s+(--[\w-]+)/g)) defined.add(m[1])
     // Set per element, never globally: `--chip-c` by the Chip colour classes,
-    // `--reka-toast-swipe-move-x` inline by Reka's ToastRoot during a swipe.
-    const perElement = new Set(['--chip-c', '--reka-toast-swipe-move-x'])
+    // `--reka-toast-swipe-move-x` inline by Reka's ToastRoot during a swipe,
+    // `--reka-popper-anchor-width` by Reka's popper wrapper (the select/combobox popup width).
+    const perElement = new Set(['--chip-c', '--reka-toast-swipe-move-x', '--reka-popper-anchor-width'])
 
     const undefinedRefs = new Set<string>()
     for (const m of css.matchAll(/var\(\s*(--[\w-]+)\s*\)/g)) {

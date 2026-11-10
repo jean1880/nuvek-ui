@@ -7,9 +7,11 @@ import {
   CardFooter,
   CardHeader,
   Chip,
+  Combobox,
   Drawer,
   Modal,
   Panel,
+  Select,
   Avatar,
   ProgressBar,
   SearchField,
@@ -37,6 +39,27 @@ const sides = ['top', 'right', 'bottom', 'left'] as const
 const intents = ['primary', 'success', 'warning', 'error'] as const
 const sizes = ['sm', 'md', 'lg'] as const
 const { toasts, showToast, dismiss } = useToasts()
+
+const fruit = ref<string | number>('')
+const fruitOptions = [
+  { value: 'apple', label: 'Apple', group: 'Pome' },
+  { value: 'pear', label: 'Pear', group: 'Pome' },
+  { value: 'plum', label: 'Plum', group: 'Stone' },
+  { value: 'cherry', label: 'Cherry (sold out)', group: 'Stone', disabled: true },
+  { value: 'fig', label: 'Fig' },
+]
+const one = ref<string | number>('')
+const tags = ref<(string | number)[]>(['red'])
+const tagOptions = ref([
+  { value: 'red', label: 'Red' },
+  { value: 'green', label: 'Green' },
+  { value: 'blue', label: 'Blue' },
+])
+function addTag(text: string) {
+  const value = text.toLowerCase()
+  tagOptions.value = [...tagOptions.value, { value, label: text }]
+  tags.value = [...tags.value, value]
+}
 </script>
 
 <template>
@@ -130,6 +153,19 @@ const { toasts, showToast, dismiss } = useToasts()
         <SearchField v-model="search" placeholder="Search without label" />
         <SearchField v-model="search" label="Disabled search" disabled />
         <SearchField v-model="text" placeholder="Empty (no clear button)" />
+      </div>
+    </Panel>
+
+    <Panel title="Select and Combobox">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <Select v-model="fruit" label="Fruit" placeholder="Pick a fruit" help="Grouped, one disabled" :options="fruitOptions" />
+        <Select v-model="fruit" label="Required" required error="Choose a fruit" :options="fruitOptions" />
+        <Select v-model="fruit" label="Small" size="sm" :options="fruitOptions" />
+        <Select v-model="fruit" label="Disabled" disabled :options="fruitOptions" />
+        <Combobox v-model="one" label="Combobox" placeholder="Type to filter" :options="fruitOptions" />
+        <Combobox v-model="tags" multiple allow-create label="Tags" placeholder="Add tags" :options="tagOptions" @create="addTag" />
+        <Combobox v-model="one" label="Loading" loading :options="[]" />
+        <Combobox v-model="one" label="Error" error="Required" :options="fruitOptions" />
       </div>
     </Panel>
 

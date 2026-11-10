@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.0
+
+Additive release.
+
+### Added
+- `Select`: themed single-choice select on Reka Select. `options` (`{ value, label, disabled?, group? }`,
+  grouped with labelled sections), `placeholder`, `label`, `help`, `error` (sets `aria-invalid` and
+  `aria-describedby`), `required`, `disabled`, `size` (`sm` / `md` / `lg`), `name`, `v-model`. The
+  popup is portalled above modals and drawers, matches the trigger width and scrolls past a maximum
+  height.
+- `Combobox`: filterable select on Reka Combobox with the same field props. Single or `multiple`
+  (removable chips in the field, named `Remove {label}`; Backspace on an empty input removes the
+  last), type-to-filter, `allowCreate` (an `Add "text"` row that emits `create`), `loading` and
+  `search` for async options, `toggleLabel` for the chevron button's name, `filter` to leave filtering to the caller, and an `empty` slot.
+- `SelectOption` and `FieldSize` types.
+
 ## 1.2.0
 
 Accessibility release. Additive except for the visual token changes below.
