@@ -2,12 +2,12 @@
 
 [![CI](https://github.com/jean1880/nuvek-ui/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jean1880/nuvek-ui/actions/workflows/ci.yml)
 
-Shared design system for nuvek homelab services: a **Tailwind v4 theme** (the design tokens) and
+Shared design system for nuvek services: a **Tailwind v4 theme** (the design tokens) and
 **headless Vue 3 components** built on [Reka UI](https://reka-ui.com) primitives and styled with
-Tailwind utilities. One source of visual truth so every service (`debian-maintainer`,
-`neo4j-graph-viz`, `warden-dashboard`, …) looks and behaves like one product.
+Tailwind utilities. One source of visual truth so every service
+looks and behaves like one product.
 
-Homelab-internal — not published to npm. Consumed as a git-tag dependency:
+Not published to npm. Consumed as a git-tag dependency:
 
 ```json
 "@nuvek/ui": "github:jean1880/nuvek-ui#v1.2.0"
@@ -69,7 +69,8 @@ spinners draw dark), a primary `:focus-visible` ring (with a transparent outline
 forced-colours modes), and a `prefers-reduced-motion` override.
 
 Contrast is enforced by a test that reads the tokens from `theme.css`: `fg-dim` is at least 4.5:1
-and `border-strong` at least 3:1 on `bg`, `bg-alt`, `surface`, `surface-hover` and `surface-active`.
+and `border-strong` at least 3:1 on `bg`, `bg-alt`, `bg-modal`, `surface`, `surface-hover` and `surface-active`; dim, muted and fg
+stay at least 1.2:1 apart.
 Use `border-strong` for the edge of a control (input, select, toggle) and `border` for decorative
 dividers only.
 
@@ -161,7 +162,8 @@ replaces the button's `px-4` rather than fighting it.
   `ToastType = 'success' (default) | 'error' | 'warning' | 'info'` — e.g.
   `showToast('Build failed', 'error')`. `durations` is one number for every type, or a per-type
   map such as `{ error: 20000 }`. By default errors stay until dismissed (`Infinity`) and every
-  other type lasts 8 s; a toast that never times out always shows its dismiss button. The stack
+  other type lasts 8 s (`Infinity` does not survive JSON serialisation, so do not round-trip toasts
+  through JSON); a toast that never times out always shows its dismiss button. The stack
   owns each toast's lifetime, so **wire both directions**:
   `<ToastStack :toasts="toasts" @dismiss="dismiss" />`.
 - `useTheme()` → `{ theme, setTheme(name), initTheme() }`.
@@ -172,12 +174,16 @@ replaces the button's `px-4` rather than fighting it.
 
 Bumping to v1.2.0 changes how existing UI looks, with no code change on your side:
 
-- **Lighter dim text.** `fg-dim` is lighter, so captions and placeholders read at 4.5:1 or better.
-- **Heavier strong borders.** `border-strong` is lighter, so input and control edges are visible
-  (3:1 or better). `surface-active` is slightly darker so both still hold on it.
+- **Lighter dim text.** `fg-dim` `#64748b` to `#909eb3`, so captions and placeholders read at
+  4.5:1 or better. `fg-muted` `#94a3b8` to `#b6c2d3` keeps dim, muted and fg distinct.
+- **Heavier strong borders.** `border-strong` `#334155` to `#728198`, so input and control edges
+  are visible (3:1 or better).
+- **Darker active surface.** `surface-active` `#334155` to `#283549`, so dim text and strong
+  borders still pass on it.
 - **Dark native controls.** `color-scheme: dark` makes checkboxes, selects, number spinners and
   scrollbars draw dark instead of light.
-- **Dialog headers.** A `Modal` or `Drawer` title renders as an `h2` inside the header.
+- **Dialog titles.** A `Modal` or `Drawer` `title` prop renders as an `h2`. A `header` slot
+  renders as before.
 - **Progress track.** `ProgressBar` has a thin outline, and its default name is `Progress`.
 - **Toasts last longer.** Errors persist until dismissed; other toasts last 8 s (was 4 s).
 - **Danger button hover.** Text is dark on the filled hover state.
@@ -195,4 +201,4 @@ npm run test         # needs a build first (compiles a consumer stylesheet again
 npm run playground   # every component × variant, for visual review
 ```
 
-Or all of it at once: `/home/jdesroches/scripts/ui-gate.sh ~/git/nuvek-ui`.
+Or all of it at once: `npm run build && npm run typecheck && npm test`.
