@@ -14,7 +14,7 @@ const buttonVariants = cva(
         ghost:
           'bg-transparent text-fg-muted not-disabled:hover:border-border-strong not-disabled:hover:bg-surface-hover not-disabled:hover:text-fg',
         danger:
-          'border-error/20 bg-error/10 text-error not-disabled:hover:bg-error not-disabled:hover:text-white',
+          'border-error/20 bg-error/10 text-error not-disabled:hover:bg-error not-disabled:hover:text-bg',
       },
     },
     defaultVariants: { variant: 'primary' },

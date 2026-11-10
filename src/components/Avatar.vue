@@ -26,9 +26,11 @@ const props = withDefaults(
     src?: string
     name: string
     size?: NonNullable<AvatarVariants['size']>
+    /** Hide the avatar from assistive tech, for when the name is already shown beside it. */
+    decorative?: boolean
     class?: HTMLAttributes['class']
   }>(),
-  { size: 'md' },
+  { size: 'md', decorative: false },
 )
 
 // First character of the first two words; Array.from keeps surrogate pairs whole.
@@ -47,8 +49,12 @@ const accessibleName = computed(() => props.name.trim() || 'Unknown')
 </script>
 
 <template>
-  <AvatarRoot :class="cn(avatarVariants({ size }), props.class)">
-    <AvatarImage v-if="src" :src="src" :alt="name" class="size-full object-cover" />
-    <AvatarFallback :aria-label="accessibleName" role="img">{{ initials }}</AvatarFallback>
+  <AvatarRoot :aria-hidden="decorative ? 'true' : undefined" :class="cn(avatarVariants({ size }), props.class)">
+    <AvatarImage v-if="src" :src="src" :alt="decorative ? '' : name" class="size-full object-cover" />
+    <AvatarFallback
+      :aria-label="decorative ? undefined : accessibleName"
+      :role="decorative ? undefined : 'img'"
+      >{{ initials }}</AvatarFallback
+    >
   </AvatarRoot>
 </template>

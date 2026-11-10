@@ -6,8 +6,19 @@ export interface Toast {
   id: number
   msg: string
   type: ToastType
-  /** How long the toast stays up, in ms. ToastStack's timer owns this (it pauses on hover). */
+  /**
+   * How long the toast stays up, in ms; `Infinity` keeps it until dismissed.
+   * ToastStack's timer owns this (it pauses on hover).
+   */
   duration: number
+}
+
+/** Per-type lifetimes in ms. Errors stay until dismissed; the rest last long enough to read. */
+export const defaultToastDurations: Record<ToastType, number> = {
+  success: 8000,
+  info: 8000,
+  warning: 8000,
+  error: Number.POSITIVE_INFINITY,
 }
 
 /**
@@ -16,13 +27,24 @@ export interface Toast {
  *
  *   const { toasts, showToast, dismiss } = useToasts()
  *   <ToastStack :toasts="toasts" @dismiss="dismiss" />
+ *
+ * Persistent toasts use `Infinity`, which JSON cannot represent (it serialises to `null`), so
+ * do not round-trip the toast list through JSON.
+ *
+ * `durations` is either one number applied to every type, or a partial per-type map
+ * layered over the defaults (errors persistent, everything else 8 s).
  */
-export function useToasts(durationMs = 4000) {
+export function useToasts(durations?: number | Partial<Record<ToastType, number>>) {
   const toasts = ref<Toast[]>([])
   let nextId = 0
 
+  const resolved: Record<ToastType, number> =
+    typeof durations === 'number'
+      ? { success: durations, info: durations, warning: durations, error: durations }
+      : { ...defaultToastDurations, ...durations }
+
   function showToast(msg: string, type: ToastType = 'success') {
-    toasts.value.push({ id: nextId++, msg, type, duration: durationMs })
+    toasts.value.push({ id: nextId++, msg, type, duration: resolved[type] })
   }
 
   function dismiss(id: number) {

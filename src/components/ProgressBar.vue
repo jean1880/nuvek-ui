@@ -25,11 +25,11 @@ const props = withDefaults(
     value: number
     max: number
     intent?: NonNullable<IndicatorVariants['intent']>
-    /** Accessible name; defaults to the percentage. */
+    /** Accessible name (what is being measured). Pass one; defaults to "Progress". */
     label?: string
     class?: HTMLAttributes['class']
   }>(),
-  { intent: 'primary' },
+  { intent: 'primary', label: 'Progress' },
 )
 
 const safeMax = computed(() => (Number.isFinite(props.max) && props.max > 0 ? props.max : 100))
@@ -39,8 +39,10 @@ const clamped = computed(() => {
 })
 const percent = computed(() => (clamped.value / safeMax.value) * 100)
 
-function valueLabel(value: number | null | undefined, max: number) {
-  return props.label ?? (typeof value === 'number' ? `${Math.round((value / max) * 100)}%` : undefined)
+// The name says what is measured; the value text carries the percentage.
+const name = computed(() => props.label || 'Progress')
+function valueText(value: number | null | undefined, max: number) {
+  return typeof value === 'number' ? `${Math.round((value / max) * 100)}%` : undefined
 }
 </script>
 
@@ -48,8 +50,14 @@ function valueLabel(value: number | null | undefined, max: number) {
   <ProgressRoot
     :model-value="clamped"
     :max="safeMax"
-    :get-value-label="valueLabel"
-    :class="cn('h-2 w-full overflow-hidden rounded-full bg-surface-hover', props.class)"
+    :get-value-label="() => name"
+    :get-value-text="valueText"
+    :class="
+      cn(
+        'h-2 w-full overflow-hidden rounded-full bg-surface-hover outline outline-1 outline-border-strong',
+        props.class,
+      )
+    "
   >
     <ProgressIndicator :class="indicatorVariants({ intent })" :style="{ width: `${percent}%` }" />
   </ProgressRoot>
