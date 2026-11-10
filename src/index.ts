@@ -5,7 +5,7 @@
 //   @import "@nuvek/ui/theme.css";
 // then `import { Button, Chip, Card, ... } from '@nuvek/ui'`.
 
-export const version = '1.2.0'
+export const version = '1.3.0'
 
 // Components
 export { default as Button } from './components/Button.vue'
@@ -37,6 +37,9 @@ export { default as MenuSeparator } from './components/MenuSeparator.vue'
 export { default as MenuLabel } from './components/MenuLabel.vue'
 export { default as Avatar } from './components/Avatar.vue'
 export { default as ProgressBar } from './components/ProgressBar.vue'
+export { default as Select } from './components/Select.vue'
+export { default as Combobox } from './components/Combobox.vue'
+export type { SelectOption, FieldSize } from './lib/field'
 
 // Composables
 export { useToasts, defaultToastDurations } from './composables/useToasts'
