@@ -61,21 +61,26 @@ function onOpenChange(next: boolean) {
         :aria-describedby="undefined"
         :class="cn(drawerVariants({ side }), props.class)"
       >
-        <header
-          v-if="title || $slots.header"
-          class="flex items-center justify-between gap-4 border-b border-border px-6 py-4 text-lg font-bold text-fg"
+        <!-- A header slot keeps its previous rendering (the slot is the title). A plain
+             `title` renders as an h2. Either way the close button is positioned over the
+             corner so it never becomes part of the dialog's name. -->
+        <DialogTitle
+          v-if="$slots.header"
+          as="header"
+          :class="cn('border-b border-border px-6 py-4 text-lg font-bold text-fg', closable && 'pe-14')"
         >
-          <DialogTitle as="h2" class="min-w-0 text-lg font-bold">
-            <slot name="header">{{ title }}</slot>
-          </DialogTitle>
-          <DialogCloseButton v-if="closable" :label="closeLabel" />
+          <slot name="header" />
+        </DialogTitle>
+        <header
+          v-else-if="title"
+          :class="cn('border-b border-border px-6 py-4 text-lg font-bold text-fg', closable && 'pe-14')"
+        >
+          <DialogTitle as="h2" class="text-lg font-bold">{{ title }}</DialogTitle>
         </header>
-        <template v-else>
-          <VisuallyHidden>
-            <DialogTitle>{{ ariaLabel }}</DialogTitle>
-          </VisuallyHidden>
-          <DialogCloseButton v-if="closable" :label="closeLabel" class="absolute end-3 top-3" />
-        </template>
+        <VisuallyHidden v-else>
+          <DialogTitle>{{ ariaLabel }}</DialogTitle>
+        </VisuallyHidden>
+        <DialogCloseButton v-if="closable" :label="closeLabel" class="absolute end-3 top-3" />
 
         <div class="flex-1 overflow-y-auto p-6">
           <slot />

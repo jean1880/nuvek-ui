@@ -37,6 +37,33 @@ describe.each([
     expect(dialog?.getAttribute('aria-labelledby')).toBe(h2?.id)
   })
 
+  it('keeps the header slot as the dialog title element, as before', async () => {
+    wrapper = mount(Comp, {
+      props: { open: true },
+      slots: { default: '<p>Body</p>', header: '<span id="custom">Custom head</span>' },
+      attachTo: document.body,
+    })
+    await settle()
+    const dialog = document.querySelector('[role="dialog"]')
+    const labelled = document.getElementById(dialog?.getAttribute('aria-labelledby') ?? '')
+    expect(labelled?.tagName).toBe('HEADER')
+    expect(labelled?.querySelector('#custom')).not.toBeNull()
+    expect(dialog?.querySelector('h2')).toBeNull()
+  })
+
+  it('a closable dialog with a header slot keeps the close button out of its name', async () => {
+    wrapper = mount(Comp, {
+      props: { open: true, closable: true },
+      slots: { default: '<p>Body</p>', header: 'Custom head' },
+      attachTo: document.body,
+    })
+    await settle()
+    const dialog = document.querySelector('[role="dialog"]')
+    const labelled = document.getElementById(dialog?.getAttribute('aria-labelledby') ?? '')
+    expect(labelled?.querySelector('button')).toBeNull()
+    expect(document.querySelector('[aria-label="Close"]')).not.toBeNull()
+  })
+
   it('has no close button unless asked', async () => {
     mountIt()
     await settle()
