@@ -28,8 +28,13 @@ const chipVariants = cva(
         md: 'px-3 py-1 text-xs',
         sm: 'px-2 py-0.5 text-2xs',
       },
+      // For a chip that is a click or toggle target: guarantees a 24 px height even at `sm`.
+      interactive: {
+        true: 'min-h-6 cursor-pointer',
+        false: '',
+      },
     },
-    defaultVariants: { color: 'neutral', variant: 'soft', size: 'md' },
+    defaultVariants: { color: 'neutral', variant: 'soft', size: 'md', interactive: false },
   },
 )
 
@@ -40,14 +45,16 @@ const props = withDefaults(
     color?: NonNullable<ChipVariants['color']>
     variant?: NonNullable<ChipVariants['variant']>
     size?: NonNullable<ChipVariants['size']>
+    /** Use when the chip is a click or toggle target: at least 24 px tall at every size. */
+    interactive?: boolean
     class?: HTMLAttributes['class']
   }>(),
-  { color: 'neutral', variant: 'soft', size: 'md' },
+  { color: 'neutral', variant: 'soft', size: 'md', interactive: false },
 )
 </script>
 
 <template>
-  <span :class="cn(chipVariants({ color, variant, size }), props.class)">
+  <span :class="cn(chipVariants({ color, variant, size, interactive }), props.class)">
     <slot />
   </span>
 </template>
