@@ -10,7 +10,7 @@ looks and behaves like one product.
 Not published to npm. Consumed as a git-tag dependency:
 
 ```json
-"@nuvek/ui": "github:jean1880/nuvek-ui#v1.2.0"
+"@nuvek/ui": "github:jean1880/nuvek-ui#v1.4.0"
 ```
 
 ## How it fits together
@@ -25,7 +25,7 @@ Not published to npm. Consumed as a git-tag dependency:
 ## Wiring a consumer
 
 ```bash
-npm install tailwindcss @tailwindcss/vite reka-ui "@nuvek/ui@github:jean1880/nuvek-ui#v1.2.0"
+npm install tailwindcss @tailwindcss/vite reka-ui "@nuvek/ui@github:jean1880/nuvek-ui#v1.4.0"
 ```
 
 ```ts
