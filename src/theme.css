@@ -205,5 +205,5 @@
     }
 }
 
-/* Alternate themes: override tokens here, e.g.
-   :root[data-theme="light"] { --color-bg: #ffffff; --color-fg: #0f172a; … } */
+/* Alternate themes live in the consuming app, as theme config files passed to
+   registerThemes() / themeToCss(), or as hand-written :root[data-theme="<name>"] blocks. */

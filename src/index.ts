@@ -5,7 +5,7 @@
 //   @import "@nuvek/ui/theme.css";
 // then `import { Button, Chip, Card, ... } from '@nuvek/ui'`.
 
-export const version = '1.3.0'
+export const version = '1.4.0'
 
 // Components
 export { default as Button } from './components/Button.vue'
@@ -45,7 +45,20 @@ export type { SelectOption, FieldSize } from './lib/field'
 export { useToasts, defaultToastDurations } from './composables/useToasts'
 export type { Toast, ToastType } from './composables/useToasts'
 export { useTheme } from './composables/useTheme'
-export type { Theme } from './composables/useTheme'
+export type { Theme, ThemeFallback } from './composables/useTheme'
+
+// Theme config files
+export {
+  COLOR_TOKENS,
+  ThemeConfigError,
+  parseTheme,
+  defineTheme,
+  themeToCss,
+  registerThemes,
+  contrastRatio,
+  themeContrastIssues,
+} from './lib/themes'
+export type { ColorToken, ColorScheme, ThemeConfig, RegisterThemesOptions } from './lib/themes'
 
 // Utilities
 export { cn } from './lib/cn'
