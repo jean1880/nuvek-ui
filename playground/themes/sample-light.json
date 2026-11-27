@@ -1,0 +1,28 @@
+{
+  "name": "sample-light",
+  "colorScheme": "light",
+  "colors": {
+    "bg": "#f8fafc",
+    "bg-alt": "#f1f5f9",
+    "bg-modal": "#ffffff",
+    "bg-code": "#f1f5f9",
+    "overlay": "rgb(15 23 42 / 0.4)",
+    "glass": "rgb(255 255 255 / 0.8)",
+    "surface": "#ffffff",
+    "surface-hover": "#f1f5f9",
+    "surface-active": "#e2e8f0",
+    "fg": "#0f172a",
+    "fg-muted": "#334155",
+    "fg-dim": "#475569",
+    "on-primary": "#ffffff",
+    "border": "#e2e8f0",
+    "border-strong": "#64748b",
+    "primary": "#0369a1",
+    "primary-hover": "#0c4a6e",
+    "primary-alt": "#4f46e5",
+    "success": "#15803d",
+    "error": "#be123c",
+    "warning": "#b45309",
+    "idle": "#64748b"
+  }
+}

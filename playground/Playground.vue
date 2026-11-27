@@ -24,8 +24,11 @@ import {
   ToastStack,
   Tooltip,
   TooltipProvider,
+  useTheme,
   useToasts,
 } from '../src'
+
+const { theme, setTheme } = useTheme()
 
 const colors = ['success', 'error', 'warning', 'running', 'idle', 'neutral'] as const
 const chipVariants = ['soft', 'filled', 'outlined'] as const
@@ -65,6 +68,15 @@ function addTag(text: string) {
 <template>
   <main class="mx-auto flex max-w-5xl flex-col gap-8 p-8">
     <h1 class="text-2xl font-bold">nuvek-ui playground</h1>
+
+    <Panel title="Theme">
+      <div class="flex flex-wrap items-center gap-3">
+        <Button :variant="theme === 'dark' ? 'primary' : 'ghost'" @click="setTheme('dark')">dark</Button>
+        <Button :variant="theme === 'sample-light' ? 'primary' : 'ghost'" @click="setTheme('sample-light')">
+          sample-light (config file)
+        </Button>
+      </div>
+    </Panel>
 
     <Panel title="Button">
       <div class="flex flex-wrap gap-3">

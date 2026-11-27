@@ -85,6 +85,46 @@ Every token is a CSS custom property. A theme is a block of overrides — no com
 `useTheme().setTheme('light')` stamps `data-theme` on `<html>` and persists it. **Only `dark`
 ships** (the system is dark-only by design).
 
+#### Theme config files
+
+An app can keep its palettes as data instead of hand-written CSS. A theme config names the
+theme, its colour scheme (for native controls; default `dark`) and any subset of the colour
+tokens. Tokens left out keep the dark values.
+
+```json
+{
+  "name": "paper",
+  "colorScheme": "light",
+  "colors": { "bg": "#fbf7ee", "fg": "#1a1712", "primary": "oklch(0.62 0.12 85)" }
+}
+```
+
+```ts
+import { registerThemes, parseTheme, useTheme } from '@nuvek/ui'
+import paper from './themes/paper.json'
+
+registerThemes([parseTheme(paper, 'paper.json')]) // validates, injects one <style>
+useTheme().initTheme({ light: 'paper', dark: 'dark' }) // OS preference at load, until the user picks
+```
+
+- `parseTheme(data, source?)` validates untrusted data and throws `ThemeConfigError` listing every
+  problem: unknown keys, unknown tokens (typos fail loudly), and colour values that could break out
+  of the declaration (`;`, braces, quotes, comments, unbalanced parentheses, and any function other
+  than `rgb`/`rgba`/`hsl`/`hsla`/`hwb`/`lab`/`lch`/`oklab`/`oklch`/`color`/`color-mix`/`light-dark`/`var`,
+  so no `url(…)`). Hex and named colours are accepted.
+- `defineTheme(config)` is the typed helper for `.ts` theme files. `COLOR_TOKENS` lists the
+  overridable tokens.
+- `registerThemes(themes, { nonce? })` injects the override blocks once (re-registering replaces
+  them) and returns a remover. Under a strict CSP without a nonce, use `themeToCss(theme)` at build
+  time and ship the result as a stylesheet instead.
+- `themeContrastIssues(theme)` checks a palette against the floors the dark theme is held to (fg
+  7:1, fg-muted and fg-dim 4.5:1, border-strong 3:1 on every background and surface) for every pair
+  given as `#rgb`/`#rrggbb`. Put it in the app's tests. `contrastRatio(a, b)` is the WCAG ratio.
+
+The injected style lands after the first paint, so a page that opens on a light theme can flash
+dark before the app script runs. If that matters, stamp `data-theme` from an inline script in
+`index.html`, or ship `themeToCss` output as a static stylesheet.
+
 ## Components
 
 Every component accepts `class`, merged **last** through `cn()` — `<Button class="px-8">`
@@ -183,7 +223,10 @@ replaces the button's `px-4` rather than fighting it.
   through JSON); a toast that never times out always shows its dismiss button. The stack
   owns each toast's lifetime, so **wire both directions**:
   `<ToastStack :toasts="toasts" @dismiss="dismiss" />`.
-- `useTheme()` → `{ theme, setTheme(name), initTheme() }`.
+- `useTheme()` → `{ theme, setTheme(name), initTheme(fallback?) }`. `fallback` is a theme name
+  (default `dark`) or `{ light, dark }` to pick by `prefers-color-scheme` at load; it applies only
+  while nothing is stored, and is not persisted. Since 1.4.0 `initTheme()` no longer writes `dark`
+  to storage on first run; a browser that already stored `dark` from an older version keeps it.
 - `cn(...classes)` — clsx + tailwind-merge, configured for this theme's custom keys. Use it in
   your own components to get the same override behaviour.
 
